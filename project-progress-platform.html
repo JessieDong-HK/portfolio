@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>学生进度管理平台 · Jess Dong</title>
+  <meta name="description" content="SouthBridge 学生进度管理平台 — FastAPI + 飞书集成的完整教务管理系统" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Caveat:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    .project-page { padding: 100px 0 140px; }
+    .project-page .section-container { max-width: 960px; }
+
+    /* Back link */
+    .project-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 56px; transition: color 0.2s;
+      text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none;
+    }
+    .project-back:hover { color: var(--klein); }
+    .project-back svg { width: 14px; height: 14px; }
+
+    /* Hero */
+    .project-hero {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-bottom: 100px;
+    }
+    .project-hero-img {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover;
+      border-radius: 16px; border: 1px solid rgba(30,58,95,0.1);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .project-hero-text .section-header-with-blob { margin-bottom: 16px; }
+    .project-hero-text .section-title-num { font-size: 13px; }
+    .project-hero-text .section-title-text { font-size: 2rem; letter-spacing: 4px; }
+    .project-handle {
+      font-family: var(--font-serif); font-size: 1.1rem; color: var(--klein);
+      margin: 0 0 16px 0; letter-spacing: 2px;
+    }
+    .project-intro { font-size: 15px; line-height: 1.85; color: var(--text-secondary); }
+
+    /* Tech tags */
+    .tech-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .tech-tag {
+      padding: 5px 12px; font-family: var(--font-mono); font-size: 10px;
+      color: var(--klein); border: 1px solid rgba(30,58,95,0.16);
+      border-radius: 100px; background: rgba(30,58,95,0.04); letter-spacing: 0.04em;
+    }
+
+    /* Feature rows — alternating layout, text top-aligned */
+    .feature-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: flex-start;
+      margin-bottom: 100px;
+    }
+    .feature-row.reverse .feature-media { order: 2; }
+    .feature-row.reverse .feature-text { order: 1; }
+
+    /* Feature media (regular features) */
+    .feature-media img.feature-img {
+      width: 100%; border-radius: 16px; border: 1px solid rgba(30,58,95,0.1);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06); display: block;
+    }
+    .feature-media-placeholder {
+      width: 100%; aspect-ratio: 4/3; border-radius: 16px;
+      border: 1px dashed rgba(30,58,95,0.15); background: rgba(30,58,95,0.02);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px; color: rgba(30,58,95,0.12);
+    }
+
+    /* Feature text */
+    .feature-label {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--klein); margin-bottom: 8px;
+    }
+    .feature-title {
+      font-family: var(--font-serif); font-size: clamp(20px, 3vw, 26px);
+      font-weight: 600; margin-bottom: 14px; letter-spacing: -0.01em; line-height: 1.3;
+    }
+    .feature-desc {
+      font-size: 14px; line-height: 1.8; color: var(--text-secondary); margin-bottom: 12px;
+    }
+    .feature-bullets {
+      list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 16px;
+    }
+    .feature-bullets li {
+      font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;
+      padding-left: 16px; position: relative;
+    }
+    .feature-bullets li::before {
+      content: ''; position: absolute; left: 0; top: 9px;
+      width: 5px; height: 5px; border-radius: 50%; background: var(--klein); opacity: 0.4;
+    }
+
+    /* ===== Feature 01: annotated notebook diagram ===== */
+    .feature-full { margin-bottom: 100px; }
+    .feature-full .feature-desc { max-width: 640px; margin-bottom: 28px; }
+
+    .notebook-diagram { position: relative; }
+    .nd-header {
+      position: absolute; left: 53%; right: 0; top: 0;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 22px 24px;
+      box-shadow: 0 2px 16px rgba(30,58,95,0.04);
+    }
+    .nd-header .feature-desc { margin-bottom: 0; }
+    .nd-img {
+      width: 44%; height: auto; display: block;
+      border-radius: 16px; border: 1px solid rgba(30,58,95,0.1);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .nd-annot {
+      position: absolute; left: 0; right: 0;
+      display: flex; align-items: center;
+      transform: translateY(-50%);
+    }
+    .nd-dot {
+      box-sizing: border-box; width: 30px; height: 30px; border-radius: 50%;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-family: var(--font-mono); font-size: 13px; font-weight: 500;
+      border: 2px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.22);
+      margin-left: calc(44% - 34px);
+    }
+    .nd-line { width: 64px; height: 2px; flex-shrink: 0; margin: 0 14px; border-radius: 1px; }
+    .nd-label { flex: 1; padding-right: 8px; }
+    .nd-label strong { display: block; font-family: var(--font-serif); font-size: 16px; margin-bottom: 4px; letter-spacing: 0.01em; }
+    .nd-label p { font-size: 13px; line-height: 1.65; color: var(--text-secondary); margin: 0; }
+
+    .nd--1 .nd-dot { background: #E07A4F; }
+    .nd--1 .nd-line { background: #E07A4F; }
+    .nd--1 .nd-label strong { color: #C45F37; }
+    .nd--2 .nd-dot { background: #7B6BD8; }
+    .nd--2 .nd-line { background: #7B6BD8; }
+    .nd--2 .nd-label strong { color: #5C4FBE; }
+    .nd--3 .nd-dot { background: #C29A2E; }
+    .nd--3 .nd-line { background: #C29A2E; }
+    .nd--3 .nd-label strong { color: #9C7A1E; }
+    .nd--4 .nd-dot { background: #4A9E7B; }
+    .nd--4 .nd-line { background: #4A9E7B; }
+    .nd--4 .nd-label strong { color: #357A5F; }
+
+    /* ===== AI interview spotlight ===== */
+    .ai-header {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius-lg); padding: 28px 30px;
+      box-shadow: 0 2px 16px rgba(30,58,95,0.04); margin-bottom: 40px;
+    }
+    .ai-header .feature-desc { margin-bottom: 18px; }
+    .ai-stat {
+      border-left: 3px solid var(--klein); background: rgba(30,58,95,0.04);
+      padding: 14px 18px; border-radius: 0 10px 10px 0;
+    }
+    .ai-stat-label {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--klein); display: block; margin-bottom: 5px;
+    }
+    .ai-stat p { font-size: 13.5px; line-height: 1.75; color: var(--text-secondary); margin: 0; }
+    .ai-stat strong { color: var(--klein); font-family: var(--font-mono); font-weight: 500; }
+
+    .ai-spotlight { margin-bottom: 48px; }
+    .ai-spotlight-imgwrap { position: relative; }
+    .ai-img {
+      width: 100%; display: block; border-radius: 16px;
+      border: 1px solid rgba(30,58,95,0.1); box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .ai-dot {
+      position: absolute; width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-family: var(--font-mono); font-size: 12px; font-weight: 500;
+      border: 2px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.22);
+      transform: translate(-50%, -50%); z-index: 2;
+    }
+    .ai-dot--1 { background: #E07A4F; }
+    .ai-dot--2 { background: #4A9E7B; }
+    .ai-dot--3 { background: #7B6BD8; }
+
+    .ai-legend {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 22px;
+    }
+    .ai-legend-item { display: flex; gap: 10px; align-items: flex-start; }
+    .ai-legend-dot {
+      flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-family: var(--font-mono); font-size: 11px; font-weight: 500; margin-top: 2px;
+    }
+    .ai-legend-item strong { display: block; font-family: var(--font-serif); font-size: 14px; margin-bottom: 3px; }
+    .ai-legend-item p { font-size: 12.5px; line-height: 1.6; color: var(--text-secondary); margin: 0; }
+
+    /* Section divider */
+    .section-label-row {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 56px;
+    }
+    .section-label-row span {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--klein); white-space: nowrap;
+    }
+    .section-label-row::after {
+      content: ''; flex: 1; height: 1px; background: rgba(30,58,95,0.1);
+    }
+
+    @media (max-width: 768px) {
+      .project-hero, .feature-row { grid-template-columns: 1fr; gap: 32px; }
+      .feature-row.reverse .feature-media { order: 1; }
+      .feature-row.reverse .feature-text { order: 2; }
+
+      .nd-img { width: 100%; }
+      .nd-annot { position: static; transform: none; margin: 18px 0 0; }
+      .nd-dot { margin-left: 0; }
+      .nd-line { width: 24px; margin: 0 10px; }
+      .ai-legend { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body style="background:var(--bg);">
+
+<section class="project-page">
+  <div class="section-container">
+
+    <!-- Back -->
+    <a href="index.html#projects" class="project-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Projects
+    </a>
+
+    <!-- Hero -->
+    <div class="project-hero">
+      <img src="assets/project-progress-notebook.jpg" alt="SouthBridge 课堂笔记界面" class="project-hero-img" />
+      <div class="project-hero-text">
+        <div class="section-header-with-blob">
+          <span class="section-title-num font-mono">03</span>
+          <h2 class="section-title-text">Student Progress</h2>
+        </div>
+        <p class="project-handle">SouthBridge 学生进度管理平台</p>
+        <p class="project-intro">
+          从学生入学到申请季结束，全流程覆盖的教务管理系统。教师高效协作、学生自助查看、家长透明跟踪——一人运营，百人规模。
+        </p>
+        <div class="tech-tags">
+          <span class="tech-tag">Python FastAPI</span>
+          <span class="tech-tag">SQLAlchemy</span>
+          <span class="tech-tag">Jinja2</span>
+          <span class="tech-tag">FullCalendar</span>
+          <span class="tech-tag">飞书 API</span>
+          <span class="tech-tag">Supabase</span>
+          <span class="tech-tag">html2canvas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section label -->
+    <div class="section-label-row"><span>Key Features</span></div>
+
+    <!-- Feature 1: Notebook (annotated diagram) -->
+    <div class="feature-full">
+      <div class="notebook-diagram">
+        <img src="assets/project-progress-notebook.jpg" alt="课堂笔记本界面" class="nd-img" loading="lazy" />
+
+        <div class="nd-header">
+          <div class="feature-label">Feature 01</div>
+          <div class="feature-title">智能课堂笔记</div>
+          <p class="feature-desc">
+            每节课后自动生成结构化课堂笔记，不再依赖教师手动整理。用三个模块把一节课最关键的东西全部浓缩——学生复习有抓手，家长一眼看懂孩子学到了什么。
+          </p>
+        </div>
+
+        <div class="nd-annot nd--1" style="top: 23%">
+          <span class="nd-dot">1</span>
+          <span class="nd-line"></span>
+          <div class="nd-label">
+            <strong>Homework · 作业</strong>
+            <p>课后必须完成的练习与任务。学生清楚下一步做什么，家长看得见进展。</p>
+          </div>
+        </div>
+
+        <div class="nd-annot nd--2" style="top: 47%">
+          <span class="nd-dot">2</span>
+          <span class="nd-line"></span>
+          <div class="nd-label">
+            <strong>Takeaway · 要点</strong>
+            <p>本节课最核心的知识浓缩，一眼抓住重点，复习不再回看整节课。</p>
+          </div>
+        </div>
+
+        <div class="nd-annot nd--3" style="top: 73%">
+          <span class="nd-dot">3</span>
+          <span class="nd-line"></span>
+          <div class="nd-label">
+            <strong>Story · 学生故事素材</strong>
+            <p>课堂中挖掘出的个人经历，直接沉淀进申请文书库，好素材不再流失。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 2: Course Records (image RIGHT, text LEFT) -->
+    <div class="feature-row reverse">
+      <div class="feature-media">
+        <img src="assets/project-progress-course-records.jpg" alt="学生端课程记录界面" class="feature-img" loading="lazy" />
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Feature 02</div>
+        <div class="feature-title">课程记录 · 学习轨迹一目了然</div>
+        <p class="feature-desc">
+          每一节课都沉淀成一条带摘要的记录——这节课讲了什么、布置了什么作业、教案在哪，按时间线排好。学生和家长随手一翻，就能回顾从第一课到现在的完整进步轨迹。
+        </p>
+        <ul class="feature-bullets">
+          <li>每节课一条记录：标题 + 时长 + 课程摘要 + 作业指引，倒序排列</li>
+          <li>摘要不只写「上了什么」，还写「进步了多少」，家长一看就懂</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">FastAPI</span>
+          <span class="tech-tag">Jinja2</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 3: AI Interview 分数变化 (image LEFT, text RIGHT) -->
+    <div class="feature-row">
+      <div class="feature-media">
+        <img src="assets/project-progress-ai-score-change.png" alt="AI 模考分数变化" class="feature-img" loading="lazy" />
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Feature 03</div>
+        <div class="feature-title">AI 模拟面试 · 分数看得见的进步</div>
+        <p class="feature-desc">
+          不是只上课就完了。每一次 AI 模拟面试都自动打分，从摸底一路涨到考前——用的就是和真实考场完全一样的 AI 面试形式（独家开发），能真实反映真实考核的大概分数。分数稳定到 8~10 分再进考场，自然不紧张。
+        </p>
+        <ul class="feature-bullets">
+          <li>五次模考 3.0 → 5.2 → 7.8 → 8.6 → 9.2，一路爬升</li>
+          <li>对比首次模考提升 207%，超过 90% 同龄申请者</li>
+        </ul>
+        <div class="ai-stat">
+          <span class="ai-stat-label">真实案例</span>
+          <p>去年全省第一、拿 A 档的同学：摸底 <strong>3 分</strong> → 考前稳定 <strong>9 分</strong>。大多数拿 A 档 / 省前 10% 的同学，摸底 3~4 分，考前稳定在 7.5~10 分。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 3: AI Interview 五维概览 (image RIGHT, text LEFT) -->
+    <div class="feature-row reverse">
+      <div class="feature-media">
+        <img src="assets/project-progress-ai-interview-dimensions.jpg" alt="AI 面试五维评分概览" class="feature-img" loading="lazy" />
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Scoring Detail</div>
+        <div class="feature-title">五维逐项打分 · 薄弱项一眼看清</div>
+        <p class="feature-desc">
+          每次面试不只给一个总分，还按英语表达、批判性思维、个人价值观、学校匹配度、跨文化交流五个维度逐项打分，哪项弱一目了然。
+        </p>
+        <ul class="feature-bullets">
+          <li>五个维度逐项评分，学生清楚知道该往哪使劲</li>
+          <li>查看全部 5 次记录，每次都有完整维度评分</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">Claude API</span>
+          <span class="tech-tag">ASR / TTS</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 4: Calendar + Lark (image LEFT, text RIGHT) -->
+    <div class="feature-row">
+      <div class="feature-media">
+        <div class="feature-media-placeholder">📅</div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Feature 04</div>
+        <div class="feature-title">课程日历 · 飞书自动排课</div>
+        <p class="feature-desc">
+          排课不再是一个个手动拉群、发链接。选定时间和学生，系统自动创建飞书视频会议，自动生成录制链接——教师只需准时出现。
+        </p>
+        <ul class="feature-bullets">
+          <li>FullCalendar 周视图，每个学生独立颜色标识，排课冲突自动提示</li>
+          <li>一键创建飞书会议 → 自动录制 → 任何人可加入，省去所有沟通成本</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">FullCalendar</span>
+          <span class="tech-tag">飞书 Open API</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 5: Lesson Plans (image RIGHT, text LEFT) -->
+    <div class="feature-row reverse">
+      <div class="feature-media">
+        <div class="feature-media-placeholder">📝</div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Feature 05</div>
+        <div class="feature-title">标准化教案中心</div>
+        <p class="feature-desc">
+          17 套教案覆盖 6 大教学模块，不再是"这节课讲什么？"的即兴发挥。每份教案包含课前准备清单、课中流程节点、课后作业模板——新手老师也能快速上手。
+        </p>
+        <ul class="feature-bullets">
+          <li>经历挖掘、面试训练、思辨分析、写作、圆桌讨论等 6 大模块全覆盖</li>
+          <li>标准化流程确保教学质量一致，快速培训新教师</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">Jinja2</span>
+          <span class="tech-tag">SQLAlchemy</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 6: Student Portal (image LEFT, text RIGHT) -->
+    <div class="feature-row">
+      <div class="feature-media">
+        <div class="feature-media-placeholder">🎓</div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Feature 06</div>
+        <div class="feature-title">学生自助门户</div>
+        <p class="feature-desc">
+          学生拥有独立的个人仪表盘——查看笔记、完成作业、追踪面试进步、管理故事素材库，无需等待老师回复。从"老师我上次的笔记在哪"变成"我自己看就好"。
+        </p>
+        <ul class="feature-bullets">
+          <li>双角色设计：教师端专业蓝紫，学生端暖纸日记风</li>
+          <li>故事素材库支持 STAR 框架录入，标签覆盖率矩阵找出素材盲区</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">FastAPI</span>
+          <span class="tech-tag">Jinja2</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 7: Application Pipeline (image RIGHT, text LEFT) -->
+    <div class="feature-row reverse">
+      <div class="feature-media">
+        <div class="feature-media-placeholder">🔄</div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Feature 07</div>
+        <div class="feature-title">申请进度管道</div>
+        <p class="feature-desc">
+          每个学生走到哪个阶段——选校、文书、提交、面试、录取——像游戏关卡一样清晰。进度条 + 任务清单，学生、老师、家长三方透明。
+        </p>
+        <ul class="feature-bullets">
+          <li>可视化流水线展示三阶段申请进度，阶段任务支持点击勾选完成</li>
+          <li>飞书自动创建学生文件夹 + 信息收集表 + 活动清单，零手工初始化</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">飞书 Open API</span>
+          <span class="tech-tag">SQLAlchemy</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back -->
+    <a href="index.html#projects" class="project-back" style="margin-bottom:0;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Projects
+    </a>
+
+  </div>
+</section>
+
+</body>
+</html>

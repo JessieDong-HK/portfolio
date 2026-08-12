@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>教师标准化管理体系 · Jess Dong</title>
+  <meta name="description" content="SouthBridge 教师标准化管理体系 — 自研教案 + 严格培训 + 全息学生档案 + 授课监督评分" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Caveat:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    .project-page { padding: 100px 0 140px; }
+    .project-page .section-container { max-width: 960px; }
+
+    /* Back link */
+    .project-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 56px; transition: color 0.2s;
+      text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none;
+    }
+    .project-back:hover { color: var(--klein); }
+    .project-back svg { width: 14px; height: 14px; }
+
+    /* Hero */
+    .project-hero {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-bottom: 100px;
+    }
+    .project-hero-img {
+      width: 100%; aspect-ratio: 4/3; object-fit: cover;
+      border-radius: 16px; border: 1px solid rgba(30,58,95,0.1);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .project-hero-placeholder {
+      width: 100%; aspect-ratio: 4/3; border-radius: 16px;
+      border: 1px dashed rgba(30,58,95,0.15); background: rgba(30,58,95,0.02);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 56px; color: rgba(30,58,95,0.14);
+    }
+    .project-hero-text .section-header-with-blob { margin-bottom: 16px; }
+    .project-hero-text .section-title-num { font-size: 13px; }
+    .project-hero-text .section-title-text { font-size: 2rem; letter-spacing: 4px; }
+    .project-handle {
+      font-family: var(--font-serif); font-size: 1.1rem; color: var(--klein);
+      margin: 0 0 16px 0; letter-spacing: 2px;
+    }
+    .project-intro { font-size: 15px; line-height: 1.85; color: var(--text-secondary); }
+
+    /* Tech tags */
+    .tech-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+    .tech-tag {
+      padding: 5px 12px; font-family: var(--font-mono); font-size: 10px;
+      color: var(--klein); border: 1px solid rgba(30,58,95,0.16);
+      border-radius: 100px; background: rgba(30,58,95,0.04); letter-spacing: 0.04em;
+    }
+
+    /* Feature rows — alternating layout, text top-aligned */
+    .feature-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: flex-start;
+      margin-bottom: 100px;
+    }
+    .feature-row.reverse .feature-media { order: 2; }
+    .feature-row.reverse .feature-text { order: 1; }
+
+    .feature-media img.feature-img {
+      width: 100%; border-radius: 16px; border: 1px solid rgba(30,58,95,0.1);
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06); display: block;
+    }
+    .feature-media-placeholder {
+      width: 100%; aspect-ratio: 4/3; border-radius: 16px;
+      border: 1px dashed rgba(30,58,95,0.15); background: rgba(30,58,95,0.02);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 40px; color: rgba(30,58,95,0.12);
+    }
+
+    /* Feature text */
+    .feature-label {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--klein); margin-bottom: 8px;
+    }
+    .feature-title {
+      font-family: var(--font-serif); font-size: clamp(20px, 3vw, 26px);
+      font-weight: 600; margin-bottom: 14px; letter-spacing: -0.01em; line-height: 1.3;
+    }
+    .feature-desc {
+      font-size: 14px; line-height: 1.8; color: var(--text-secondary); margin-bottom: 12px;
+    }
+    .feature-bullets {
+      list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px;
+      margin-bottom: 16px;
+    }
+    .feature-bullets li {
+      font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;
+      padding-left: 16px; position: relative;
+    }
+    .feature-bullets li::before {
+      content: ''; position: absolute; left: 0; top: 9px;
+      width: 5px; height: 5px; border-radius: 50%; background: var(--klein); opacity: 0.4;
+    }
+
+    /* Section divider */
+    .section-label-row {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 56px;
+    }
+    .section-label-row span {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--klein); white-space: nowrap;
+    }
+    .section-label-row::after {
+      content: ''; flex: 1; height: 1px; background: rgba(30,58,95,0.1);
+    }
+
+    @media (max-width: 768px) {
+      .project-hero, .feature-row { grid-template-columns: 1fr; gap: 32px; }
+      .feature-row.reverse .feature-media { order: 1; }
+      .feature-row.reverse .feature-text { order: 2; }
+    }
+  </style>
+</head>
+<body style="background:var(--bg);">
+
+<section class="project-page">
+  <div class="section-container">
+
+    <!-- Back -->
+    <a href="index.html#projects" class="project-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Projects
+    </a>
+
+    <!-- Hero -->
+    <div class="project-hero">
+      <div class="project-hero-placeholder">🏫</div>
+      <div class="project-hero-text">
+        <div class="section-header-with-blob">
+          <span class="section-title-num font-mono">04</span>
+          <h2 class="section-title-text">Teacher Standardization</h2>
+        </div>
+        <p class="project-handle">SouthBridge 教师标准化管理体系</p>
+        <p class="project-intro">
+          把「好老师」变成一套可复制的系统。自研教案、严格培训、全息学生档案、授课逐字稿监督评分——教学质量不押在个别名师身上，而押在体系上。
+        </p>
+        <div class="tech-tags">
+          <span class="tech-tag">Python FastAPI</span>
+          <span class="tech-tag">SQLAlchemy</span>
+          <span class="tech-tag">Jinja2</span>
+          <span class="tech-tag">飞书 Open API</span>
+          <span class="tech-tag">Supabase</span>
+          <span class="tech-tag">Claude API</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section label -->
+    <div class="section-label-row"><span>Key Features</span></div>
+
+    <!-- Feature 1: Standardized Lesson Plans (image LEFT, text RIGHT) -->
+    <div class="feature-row">
+      <div class="feature-media">
+        <div class="feature-media-placeholder">📝</div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Feature 01</div>
+        <div class="feature-title">标准化教案中心 · 自研课件</div>
+        <p class="feature-desc">
+          17 套自研教案覆盖 6 大教学模块。每一节课「教什么、怎么教、留什么作业」都在开课前定好——不是让老师即兴发挥，而是让任何一位通过培训的老师，照着体系就能上出高质量的课。
+        </p>
+        <ul class="feature-bullets">
+          <li>17 套教案 × 6 大模块：经历挖掘 / 面试训练 / 思辨分析 / 写作 / 圆桌讨论</li>
+          <li>每份教案含课前准备清单、课中流程节点、课后作业模板，三步到位</li>
+          <li>区别市面多数机构：先有体系再培训人，而不是招了老师让他自己设计每节课</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">Jinja2</span>
+          <span class="tech-tag">SQLAlchemy</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 2: Teacher Training (image RIGHT, text LEFT) -->
+    <div class="feature-row reverse">
+      <div class="feature-media">
+        <div class="feature-media-placeholder">🎓</div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Feature 02</div>
+        <div class="feature-title">严格标准化培训体系</div>
+        <p class="feature-desc">
+          每位老师上岗前走完同一条流水线：研读课件 → 跟课旁听 → 试讲考核 → 达标才接学生。质量不靠「招到好老师」的运气，靠「把普通老师训成好老师」的确定性。
+        </p>
+        <ul class="feature-bullets">
+          <li>统一培训 + 试讲打分，达标才放行</li>
+          <li>新老师成长路径标准化，快速复制高质量交付</li>
+          <li>解决行业通病：不依赖个别名师，规模扩张不掉质量</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">FastAPI</span>
+          <span class="tech-tag">飞书 Open API</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 3: Student Profile (image LEFT, text RIGHT) -->
+    <div class="feature-row">
+      <div class="feature-media">
+        <div class="feature-media-placeholder">🧑‍🎓</div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Feature 03</div>
+        <div class="feature-title">学生全息档案 · 换老师零信息差</div>
+        <p class="feature-desc">
+          一个学生，一份全息档案——基础信息、目标院校、每节课表现、强弱项、进步轨迹，所有模块的老师共享同一份。换老师不换「认知」，针对性辅导无缝衔接。
+        </p>
+        <ul class="feature-bullets">
+          <li>跨模块老师看到同一份学生档案，优势劣势一目了然</li>
+          <li>换老师零信息差，新老师接手即懂学生，辅导不断档</li>
+          <li>针对性辅导：哪项弱就补哪项，而不是「从头再教一遍」</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">Supabase</span>
+          <span class="tech-tag">SQLAlchemy</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 4: Teaching Quality Scoring (image RIGHT, text LEFT) -->
+    <div class="feature-row reverse">
+      <div class="feature-media">
+        <div class="feature-media-placeholder">📊</div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">Feature 04</div>
+        <div class="feature-title">授课逐字稿 + 监督评分</div>
+        <p class="feature-desc">
+          每节课全程录制，逐字稿自动存档；监督随机抽查、系统化打分。每个老师的交付质量都有数据可查——不靠口碑，靠评分。
+        </p>
+        <ul class="feature-bullets">
+          <li>全部会议逐字稿永久保存，随时回溯任何一节课</li>
+          <li>授课评分 + 监督抽查，交付质量持续可控</li>
+          <li>老师质量可量化、可比较，管理不再是「凭感觉」</li>
+        </ul>
+        <div class="tech-tags">
+          <span class="tech-tag">Claude API</span>
+          <span class="tech-tag">ASR / 逐字稿</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Back -->
+    <a href="index.html#projects" class="project-back" style="margin-bottom:0;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Projects
+    </a>
+
+  </div>
+</section>
+
+</body>
+</html>

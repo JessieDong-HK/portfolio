@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Project 展示组件对比 · Jess Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --klein: #1E3A5F;
+    --klein-10: rgba(30,58,95,0.10);
+    --klein-20: rgba(30,58,95,0.20);
+    --accent: #C2784A;
+    --bg: #FAF7F2;
+    --card-bg: #ffffff;
+    --text: #1C1C1C;
+    --text-secondary: #6B6560;
+    --text-muted: #9D9790;
+    --border: #E8E4DF;
+    --font-serif: 'Cormorant Garamond', Georgia, serif;
+    --font-mono: 'JetBrains Mono', 'Courier New', monospace;
+    --font-body: 'Noto Sans SC', system-ui, -apple-system, sans-serif;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page-header {
+    text-align: center;
+    padding: 64px 24px 40px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .page-header h1 {
+    font-family: var(--font-serif);
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 400;
+    color: var(--klein);
+    letter-spacing: -0.01em;
+    margin-bottom: 12px;
+  }
+  .page-header p {
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+
+  /* Section divider */
+  .section-divider {
+    max-width: 1200px;
+    margin: 48px auto 24px;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--klein);
+    white-space: nowrap;
+  }
+  .section-subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ============================================
+     OPTION 1: BENTO GRID
+     ============================================ */
+  .bento-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 180px;
+    gap: 16px;
+  }
+  .bento-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+  }
+  .bento-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+    border-color: var(--klein-20);
+  }
+  .bento-card.featured { grid-column: span 2; grid-row: span 2; }
+  .bento-card.wide { grid-column: span 2; }
+  .bento-card.tall { grid-row: span 2; }
+  .bento-card .card-img {
+    flex: 1;
+    background: var(--klein-10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    min-height: 80px;
+  }
+  .bento-card.featured .card-img { min-height: 200px; }
+  .bento-card .card-body {
+    padding: 16px 20px;
+    border-top: 1px solid var(--border);
+  }
+  .bento-card .card-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--klein);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .bento-card .card-title {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .bento-card .card-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .bento-card .card-link {
+    display: inline-block;
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--klein);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .bento-card:hover .card-link { border-color: var(--klein); }
+
+  @media (max-width: 768px) {
+    .bento-grid { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
+    .bento-card.featured { grid-column: span 2; grid-row: span 2; }
+    .bento-card.wide { grid-column: span 2; }
+  }
+  @media (max-width: 480px) {
+    .bento-grid { grid-template-columns: 1fr; grid-auto-rows: auto; }
+    .bento-card.featured, .bento-card.wide, .bento-card.tall { grid-column: span 1; grid-row: span 1; }
+    .bento-card .card-img { min-height: 140px; }
+  }
+
+  /* ============================================
+     OPTION 2: 3D TILT CARDS
+     ============================================ */
+  .tilt-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .tilt-stage {
+    perspective: 1000px;
+  }
+  .tilt-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease-out, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  .tilt-card:hover {
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+  }
+  .tilt-card .tilt-img {
+    height: 180px;
+    background: linear-gradient(135deg, var(--klein-10), var(--klein-20));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    transform: translateZ(20px);
+  }
+  .tilt-card .tilt-body {
+    padding: 20px;
+    transform: translateZ(30px);
+  }
+  .tilt-card .tilt-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--klein);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .tilt-card .tilt-title {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .tilt-card .tilt-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .tilt-card .tilt-link {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--klein);
+    text-decoration: none;
+  }
+  /* Glow highlight */
+  .tilt-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: 12px;
+  }
+  .tilt-card:hover .tilt-glow { opacity: 1; }
+
+  @media (max-width: 768px) { .tilt-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .tilt-grid { grid-template-columns: 1fr; } }
+
+  /* ============================================
+     OPTION 3: STAGGERED CARDS (alternating)
+     ============================================ */
+  .stagger-list {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+  .stagger-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .stagger-item.visible { opacity: 1; transform: translateY(0); }
+  .stagger-item:nth-child(even) .stagger-img { order: 2; }
+  .stagger-item:nth-child(even) .stagger-content { order: 1; }
+  .stagger-img {
+    aspect-ratio: 4/3;
+    background: linear-gradient(135deg, var(--klein-10), var(--klein-20));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .stagger-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--klein);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+  .stagger-title {
+    font-family: var(--font-serif);
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  .stagger-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+  .stagger-link {
+    display: inline-block;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--klein);
+    text-decoration: none;
+    border-bottom: 1px solid var(--klein-20);
+    transition: border-color 0.2s;
+  }
+  .stagger-link:hover { border-color: var(--klein); }
+  @media (max-width: 640px) {
+    .stagger-item { grid-template-columns: 1fr; gap: 20px; }
+    .stagger-item:nth-child(even) .stagger-img { order: -1; }
+  }
+
+  /* ============================================
+     OPTION 4: HORIZONTAL SCROLL
+     ============================================ */
+  .hscroll-wrap {
+    max-width: 100%;
+    padding: 0 0 48px;
+    position: relative;
+  }
+  .hscroll-track {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 24px 20px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--klein-20) transparent;
+  }
+  .hscroll-card {
+    flex: 0 0 340px;
+    scroll-snap-align: start;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+  .hscroll-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+  .hscroll-card .hscroll-img {
+    height: 200px;
+    background: linear-gradient(135deg, var(--klein-10), var(--klein-20));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .hscroll-card .hscroll-body { padding: 20px; }
+  .hscroll-card .hscroll-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--klein);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .hscroll-card .hscroll-title {
+    font-family: var(--font-serif);
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .hscroll-card .hscroll-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  .hscroll-hint {
+    text-align: center;
+    margin-top: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .hscroll-hint span { animation: hintPulse 1.5s ease-in-out infinite; }
+  @keyframes hintPulse {
+    0%, 100% { opacity: 0.4; transform: translateX(0); }
+    50% { opacity: 1; transform: translateX(4px); }
+  }
+
+  /* ============================================
+     OPTION 5: MASONRY (Pinterest-style)
+     ============================================ */
+  .masonry-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+    columns: 3;
+    column-gap: 20px;
+  }
+  .masonry-card {
+    break-inside: avoid;
+    margin-bottom: 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .masonry-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+  .masonry-card .masonry-img {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: linear-gradient(135deg, var(--klein-10), var(--klein-20));
+  }
+  .masonry-card:nth-child(1) .masonry-img { height: 240px; }
+  .masonry-card:nth-child(2) .masonry-img { height: 160px; }
+  .masonry-card:nth-child(3) .masonry-img { height: 200px; }
+  .masonry-card:nth-child(4) .masonry-img { height: 180px; }
+  .masonry-card:nth-child(5) .masonry-img { height: 220px; }
+  .masonry-card .masonry-body { padding: 16px 20px; }
+  .masonry-card .masonry-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--klein);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+  }
+  .masonry-card .masonry-title {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .masonry-card .masonry-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+  @media (max-width: 768px) { .masonry-grid { columns: 2; } }
+  @media (max-width: 480px) { .masonry-grid { columns: 1; } }
+
+  /* ============================================
+     OPTION 6: EXPANDING STACK
+     ============================================ */
+  .stack-list {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 0 24px 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .stack-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .stack-item:hover {
+    border-color: var(--klein-20);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+  .stack-header {
+    display: flex;
+    align-items: center;
+    padding: 18px 24px;
+    gap: 16px;
+  }
+  .stack-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--klein);
+    min-width: 28px;
+  }
+  .stack-title {
+    font-family: var(--font-serif);
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+  }
+  .stack-arrow {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text-muted);
+    transition: transform 0.3s;
+  }
+  .stack-item:hover .stack-arrow { transform: rotate(90deg); }
+  .stack-preview {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), padding 0.3s;
+  }
+  .stack-item:hover .stack-preview {
+    max-height: 120px;
+  }
+  .stack-preview-inner {
+    padding: 0 24px 18px 68px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+  }
+  .stack-preview-img {
+    width: 100px;
+    height: 70px;
+    border-radius: 6px;
+    background: var(--klein-10);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+  .stack-preview-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* ============================================
+     DECISION FOOTER
+     ============================================ */
+  .decision-bar {
+    position: sticky;
+    bottom: 0;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-secondary);
+    z-index: 100;
+  }
+  .decision-bar strong { color: var(--klein); }
+
+  /* Scroll reveal */
+  .reveal-section { opacity: 0; transform: translateY(20px); transition: all 0.5s ease; }
+  .reveal-section.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Project 展示组件对比</h1>
+  <p>同一个项目数据，六种不同的展示方式。悬停、点击、滚动——实际体验一下哪种最顺手。</p>
+</div>
+
+<!-- ====== OPTION 1: BENTO GRID ====== -->
+<div class="section-divider"><span class="section-label">Option A</span><span class="section-subtitle">Bento Grid — Apple 风格不对称网格，旗舰项目占双倍空间</span></div>
+<div class="bento-grid reveal-section" id="opt1">
+  <div class="bento-card featured">
+    <div class="card-img">🖥️ 项目截图预览</div>
+    <div class="card-body">
+      <div class="card-meta">01 · AI Consulting CRM</div>
+      <div class="card-title">SouthBridge CRM</div>
+      <div class="card-desc">AI 驱动留学咨询管理。微信截图 OCR → AI 解析 → 智能报告，全流程自动化。已部署，真实业务跑着。</div>
+      <a href="#" class="card-link">Live Demo →</a>
+    </div>
+  </div>
+  <div class="bento-card wide">
+    <div class="card-img">🤖 项目截图预览</div>
+    <div class="card-body">
+      <div class="card-meta">02 · AI Interview</div>
+      <div class="card-title">AI 模拟面试平台</div>
+      <div class="card-desc">Next.js 16 + Claude API + 语音技术。7维度题库、AI评分、动态追问。</div>
+    </div>
+  </div>
+  <div class="bento-card">
+    <div class="card-img">📊</div>
+    <div class="card-body">
+      <div class="card-meta">03 · Progress</div>
+      <div class="card-title">进度管理</div>
+      <div class="card-desc">FastAPI + 飞书集成。教案中心、课程日历。</div>
+    </div>
+  </div>
+  <div class="bento-card">
+    <div class="card-img">🎓</div>
+    <div class="card-body">
+      <div class="card-meta">04 · Mentorship</div>
+      <div class="card-title">Mentorship 网络</div>
+      <div class="card-desc">15位名校导师，6条赛道，5级服务。</div>
+    </div>
+  </div>
+  <div class="bento-card tall">
+    <div class="card-img">💃 项目截图预览</div>
+    <div class="card-body">
+      <div class="card-meta">05 · Creative Tool</div>
+      <div class="card-title">随机舞蹈工具</div>
+      <div class="card-desc">Fisher-Yates 随机算法 + Web Audio 倒计时。小而美的创意工具。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== OPTION 2: 3D TILT CARDS ====== -->
+<div class="section-divider"><span class="section-label">Option B</span><span class="section-subtitle">3D Tilt Cards — 鼠标移动卡片跟随倾斜，有光晕效果（试试看！）</span></div>
+<div class="tilt-grid reveal-section" id="opt2">
+  <div class="tilt-stage">
+    <div class="tilt-card" data-tilt>
+      <div class="tilt-glow"></div>
+      <div class="tilt-img">🖥️ 悬停试试</div>
+      <div class="tilt-body">
+        <div class="tilt-meta">01 · CRM</div>
+        <div class="tilt-title">SouthBridge CRM</div>
+        <div class="tilt-desc">AI 驱动留学咨询管理。OCR → AI 解析 → 智能报告。</div>
+        <a href="#" class="tilt-link">Live Demo →</a>
+      </div>
+    </div>
+  </div>
+  <div class="tilt-stage">
+    <div class="tilt-card" data-tilt>
+      <div class="tilt-glow"></div>
+      <div class="tilt-img">🤖 悬停试试</div>
+      <div class="tilt-body">
+        <div class="tilt-meta">02 · AI Interview</div>
+        <div class="tilt-title">AI 面试平台</div>
+        <div class="tilt-desc">Next.js 16 + Claude + 语音技术。7维度题库，AI评分。</div>
+        <a href="#" class="tilt-link">查看项目 →</a>
+      </div>
+    </div>
+  </div>
+  <div class="tilt-stage">
+    <div class="tilt-card" data-tilt>
+      <div class="tilt-glow"></div>
+      <div class="tilt-img">📊 悬停试试</div>
+      <div class="tilt-body">
+        <div class="tilt-meta">03 · Progress</div>
+        <div class="tilt-title">进度管理平台</div>
+        <div class="tilt-desc">FastAPI + 飞书集成。教案中心，课程日历。</div>
+        <a href="#" class="tilt-link">Live Demo →</a>
+      </div>
+    </div>
+  </div>
+  <div class="tilt-stage">
+    <div class="tilt-card" data-tilt>
+      <div class="tilt-glow"></div>
+      <div class="tilt-img">🎓 悬停试试</div>
+      <div class="tilt-body">
+        <div class="tilt-meta">04 · Mentorship</div>
+        <div class="tilt-title">Mentorship 网络</div>
+        <div class="tilt-desc">15位名校导师，6条赛道，5级服务体系。</div>
+        <a href="#" class="tilt-link">查看项目 →</a>
+      </div>
+    </div>
+  </div>
+  <div class="tilt-stage">
+    <div class="tilt-card" data-tilt>
+      <div class="tilt-glow"></div>
+      <div class="tilt-img">💃 悬停试试</div>
+      <div class="tilt-body">
+        <div class="tilt-meta">05 · Creative</div>
+        <div class="tilt-title">随机舞蹈工具</div>
+        <div class="tilt-desc">随机算法 + 倒计时音效。小而美的创意工具。</div>
+        <a href="#" class="tilt-link">查看项目 →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== OPTION 3: STAGGERED ALTERNATING ====== -->
+<div class="section-divider"><span class="section-label">Option C</span><span class="section-subtitle">Staggered Cards — 左右交替排布，滚动淡入，编辑感强</span></div>
+<div class="stagger-list reveal-section" id="opt3">
+  <div class="stagger-item">
+    <div class="stagger-img">🖥️ 项目截图预览</div>
+    <div class="stagger-content">
+      <div class="stagger-num">01 · AI Consulting CRM</div>
+      <div class="stagger-title">SouthBridge CRM</div>
+      <div class="stagger-desc">AI 驱动的留学咨询管理系统。微信截图 OCR → AI 解析 → 结构化存储 → 智能报告生成，全流程自动化。已部署在 southbridge.asia，真实业务运行中。</div>
+      <a href="#" class="stagger-link">Live Demo →</a>
+    </div>
+  </div>
+  <div class="stagger-item">
+    <div class="stagger-img">🤖 项目截图预览</div>
+    <div class="stagger-content">
+      <div class="stagger-num">02 · AI Interview Platform</div>
+      <div class="stagger-title">AI 模拟面试平台</div>
+      <div class="stagger-desc">Next.js 16 + Claude API + Volcengine 语音技术。7 维度独家题库、5 维度 AI 评分、动态追问逻辑。1:1 还原真实面试体验。</div>
+      <a href="#" class="stagger-link">查看项目 →</a>
+    </div>
+  </div>
+  <div class="stagger-item">
+    <div class="stagger-img">📊 项目截图预览</div>
+    <div class="stagger-content">
+      <div class="stagger-num">03 · Student Progress</div>
+      <div class="stagger-title">学生进度管理平台</div>
+      <div class="stagger-desc">FastAPI + 飞书集成 + Supabase。教案中心、课程日历、AI 面试同步、学生门户——完整的教务管理系统。</div>
+      <a href="#" class="stagger-link">Live Demo →</a>
+    </div>
+  </div>
+  <div class="stagger-item">
+    <div class="stagger-img">🎓 项目截图预览</div>
+    <div class="stagger-content">
+      <div class="stagger-num">04 · Mentorship Network</div>
+      <div class="stagger-title">Mentorship 网络</div>
+      <div class="stagger-desc">15 位名校导师（哈佛、宾大、芝加哥、西北、康奈尔），6 条申请赛道，5 级服务体系。连接在读生与申请者的 peer mentorship 平台。</div>
+      <a href="#" class="stagger-link">查看项目 →</a>
+    </div>
+  </div>
+  <div class="stagger-item">
+    <div class="stagger-img">💃 项目截图预览</div>
+    <div class="stagger-content">
+      <div class="stagger-num">05 · Creative Tool</div>
+      <div class="stagger-title">随机舞蹈练习工具</div>
+      <div class="stagger-desc">Fisher-Yates 随机算法 + Web Audio API 倒计时音效。小而美的创意工具——因为跳舞是我坚持了 20 年的事。</div>
+      <a href="#" class="stagger-link">查看项目 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- ====== OPTION 4: HORIZONTAL SCROLL ====== -->
+<div class="section-divider"><span class="section-label">Option D</span><span class="section-subtitle">Horizontal Scroll — 左右滑动浏览，像 Netflix 一样（试试滚动→）</span></div>
+<div class="hscroll-wrap reveal-section" id="opt4">
+  <div class="hscroll-track">
+    <div class="hscroll-card">
+      <div class="hscroll-img">🖥️ 项目截图预览</div>
+      <div class="hscroll-body">
+        <div class="hscroll-meta">01 · CRM</div>
+        <div class="hscroll-title">SouthBridge CRM</div>
+        <div class="hscroll-desc">AI 驱动留学咨询管理。OCR → AI 解析 → 智能报告，全流程自动化。已部署，真实业务。</div>
+      </div>
+    </div>
+    <div class="hscroll-card">
+      <div class="hscroll-img">🤖 项目截图预览</div>
+      <div class="hscroll-body">
+        <div class="hscroll-meta">02 · AI Interview</div>
+        <div class="hscroll-title">AI 面试平台</div>
+        <div class="hscroll-desc">Next.js 16 + Claude + 语音技术。7维度题库，AI评分，动态追问。</div>
+      </div>
+    </div>
+    <div class="hscroll-card">
+      <div class="hscroll-img">📊 项目截图预览</div>
+      <div class="hscroll-body">
+        <div class="hscroll-meta">03 · Progress</div>
+        <div class="hscroll-title">进度管理平台</div>
+        <div class="hscroll-desc">FastAPI + 飞书集成。教案中心、课程日历、AI面试同步、学生门户。</div>
+      </div>
+    </div>
+    <div class="hscroll-card">
+      <div class="hscroll-img">🎓 项目截图预览</div>
+      <div class="hscroll-body">
+        <div class="hscroll-meta">04 · Mentorship</div>
+        <div class="hscroll-title">Mentorship 网络</div>
+        <div class="hscroll-desc">15位名校导师，6条赛道，5级服务体系。peer mentorship 平台。</div>
+      </div>
+    </div>
+    <div class="hscroll-card">
+      <div class="hscroll-img">💃 项目截图预览</div>
+      <div class="hscroll-body">
+        <div class="hscroll-meta">05 · Creative</div>
+        <div class="hscroll-title">随机舞蹈工具</div>
+        <div class="hscroll-desc">随机算法 + 倒计时音效。小而美的创意工具。跳舞20年。</div>
+      </div>
+    </div>
+  </div>
+  <div class="hscroll-hint">← 左右滑动浏览 <span>→</span></div>
+</div>
+
+<!-- ====== OPTION 5: MASONRY ====== -->
+<div class="section-divider"><span class="section-label">Option E</span><span class="section-subtitle">Masonry Grid — Pinterest 式瀑布流，每张卡片高度不同</span></div>
+<div class="masonry-grid reveal-section" id="opt5">
+  <div class="masonry-card">
+    <div class="masonry-img">🖥️ 项目截图预览</div>
+    <div class="masonry-body">
+      <div class="masonry-meta">01 · CRM</div>
+      <div class="masonry-title">SouthBridge CRM</div>
+      <div class="masonry-desc">AI 驱动留学咨询管理。OCR → AI 解析 → 智能报告，全流程自动化。已部署在 southbridge.asia。</div>
+    </div>
+  </div>
+  <div class="masonry-card">
+    <div class="masonry-img">🤖 项目截图预览</div>
+    <div class="masonry-body">
+      <div class="masonry-meta">02 · AI Interview</div>
+      <div class="masonry-title">AI 面试平台</div>
+      <div class="masonry-desc">Next.js 16 + Claude + 语音。7维度题库，AI评分。</div>
+    </div>
+  </div>
+  <div class="masonry-card">
+    <div class="masonry-img">📊 项目截图预览</div>
+    <div class="masonry-body">
+      <div class="masonry-meta">03 · Progress</div>
+      <div class="masonry-title">进度管理平台</div>
+      <div class="masonry-desc">FastAPI + 飞书集成。教案中心、课程日历、AI面试同步、学生门户——完整的教务管理系统。</div>
+    </div>
+  </div>
+  <div class="masonry-card">
+    <div class="masonry-img">🎓 项目截图预览</div>
+    <div class="masonry-body">
+      <div class="masonry-meta">04 · Mentorship</div>
+      <div class="masonry-title">Mentorship 网络</div>
+      <div class="masonry-desc">15位名校导师，6条赛道，5级服务体系。</div>
+    </div>
+  </div>
+  <div class="masonry-card">
+    <div class="masonry-img">💃 项目截图预览</div>
+    <div class="masonry-body">
+      <div class="masonry-meta">05 · Creative Tool</div>
+      <div class="masonry-title">随机舞蹈工具</div>
+      <div class="masonry-desc">Fisher-Yates 随机算法 + Web Audio 倒计时音效。小而美的创意工具——因为跳舞是我坚持了 20 年的事。</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== OPTION 6: EXPANDING STACK ====== -->
+<div class="section-divider"><span class="section-label">Option F</span><span class="section-subtitle">Expanding Stack — 紧凑列表，悬停展开详情（像 FAQ 折叠）</span></div>
+<div class="stack-list reveal-section" id="opt6">
+  <div class="stack-item">
+    <div class="stack-header">
+      <span class="stack-num">01</span>
+      <span class="stack-title">SouthBridge CRM</span>
+      <span class="stack-arrow">→</span>
+    </div>
+    <div class="stack-preview">
+      <div class="stack-preview-inner">
+        <div class="stack-preview-img">🖥️ 截图</div>
+        <p class="stack-preview-desc">AI 驱动的留学咨询管理系统。微信截图 OCR → AI 解析 → 结构化存储 → 智能报告生成，全流程自动化。已部署，真实业务运行中。</p>
+      </div>
+    </div>
+  </div>
+  <div class="stack-item">
+    <div class="stack-header">
+      <span class="stack-num">02</span>
+      <span class="stack-title">AI 模拟面试平台</span>
+      <span class="stack-arrow">→</span>
+    </div>
+    <div class="stack-preview">
+      <div class="stack-preview-inner">
+        <div class="stack-preview-img">🤖 截图</div>
+        <p class="stack-preview-desc">Next.js 16 + Claude API + Volcengine 语音技术。7 维度题库、5 维度 AI 评分、动态追问。</p>
+      </div>
+    </div>
+  </div>
+  <div class="stack-item">
+    <div class="stack-header">
+      <span class="stack-num">03</span>
+      <span class="stack-title">学生进度管理平台</span>
+      <span class="stack-arrow">→</span>
+    </div>
+    <div class="stack-preview">
+      <div class="stack-preview-inner">
+        <div class="stack-preview-img">📊 截图</div>
+        <p class="stack-preview-desc">FastAPI + 飞书集成 + Supabase。教案中心、课程日历、AI 面试同步、学生门户。</p>
+      </div>
+    </div>
+  </div>
+  <div class="stack-item">
+    <div class="stack-header">
+      <span class="stack-num">04</span>
+      <span class="stack-title">Mentorship 网络</span>
+      <span class="stack-arrow">→</span>
+    </div>
+    <div class="stack-preview">
+      <div class="stack-preview-inner">
+        <div class="stack-preview-img">🎓 截图</div>
+        <p class="stack-preview-desc">15 位名校导师（哈佛、宾大、芝加哥、西北、康奈尔），6 条申请赛道，5 级服务体系。</p>
+      </div>
+    </div>
+  </div>
+  <div class="stack-item">
+    <div class="stack-header">
+      <span class="stack-num">05</span>
+      <span class="stack-title">随机舞蹈练习工具</span>
+      <span class="stack-arrow">→</span>
+    </div>
+    <div class="stack-preview">
+      <div class="stack-preview-inner">
+        <div class="stack-preview-img">💃 截图</div>
+        <p class="stack-preview-desc">Fisher-Yates 随机算法 + Web Audio API 倒计时音效。小而美的创意工具——跳舞 20 年。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== DECISION BAR ====== -->
+<div class="decision-bar">
+  你觉得哪个方向最对？<strong>A</strong> Bento · <strong>B</strong> 3D Tilt · <strong>C</strong> 交替卡片 · <strong>D</strong> 横向滑动 · <strong>E</strong> 瀑布流 · <strong>F</strong> 折叠列表
+</div>
+
+<script>
+// ============ 3D TILT EFFECT (Option B) ============
+document.querySelectorAll('[data-tilt]').forEach(card => {
+  card.addEventListener('mousemove', (e) => {
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotateX = ((y - cy) / cy) * -8;
+    const rotateY = ((x - cx) / cx) * 8;
+    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02,1.02,1.02)`;
+
+    // Update glow position
+    const glow = card.querySelector('.tilt-glow');
+    if (glow) {
+      glow.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(30,58,95,0.08), transparent 60%)`;
+    }
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1,1,1)';
+  });
+});
+
+// ============ SCROLL REVEAL ============
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      // Also reveal stagger items inside
+      entry.target.querySelectorAll('.stagger-item').forEach((item, i) => {
+        setTimeout(() => item.classList.add('visible'), i * 100);
+      });
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal-section').forEach(el => revealObserver.observe(el));
+
+// ============ OPTION 3: Stagger scroll reveal ============
+const staggerObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.stagger-item').forEach((item, i) => {
+        setTimeout(() => item.classList.add('visible'), i * 120);
+      });
+    }
+  });
+}, { threshold: 0.15 });
+const staggerContainer = document.getElementById('opt3');
+if (staggerContainer) staggerObserver.observe(staggerContainer);
+</script>
+</body>
+</html>

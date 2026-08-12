@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>过来人Mentor · 品牌官网 · Jess Dong</title>
+  <meta name="description" content="过来人Mentor 品牌官网 — 不做中介做过来人，连接顶尖名校学长学姐与申请者的朋辈升学平台" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Caveat:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    .project-page { padding: 90px 0 140px; }
+    .project-page .section-container { max-width: 1160px; }
+
+    .project-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+      margin-bottom: 48px; transition: color 0.2s;
+      text-transform: uppercase; letter-spacing: 0.06em; text-decoration: none;
+    }
+    .project-back:hover { color: var(--klein); }
+    .project-back svg { width: 14px; height: 14px; }
+
+    /* ===== Hero ===== */
+    .hero { text-align: center; margin-bottom: 56px; }
+    .demo-banner {
+      display: inline-flex; align-items: center; gap: 12px;
+      font-family: var(--font-mono); font-weight: 600;
+      font-size: clamp(17px, 2.6vw, 24px); letter-spacing: 0.06em;
+      color: #fff; background: #E8590C;
+      padding: 18px 42px; border-radius: 14px;
+      margin-bottom: 44px;
+      box-shadow: 0 12px 32px rgba(232,89,12,0.22);
+    }
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(40px, 7.5vw, 72px); font-weight: 600;
+      line-height: 1.06; letter-spacing: -0.02em; color: var(--klein);
+      margin: 0 0 20px;
+    }
+    .hero-sub {
+      font-size: 16px; line-height: 1.85; color: var(--text-secondary);
+      max-width: 640px; margin: 0 auto 0;
+    }
+    .hero-sub b { color: var(--klein); font-weight: 600; }
+
+    /* marquee */
+    .school-marquee { overflow: hidden; margin: 40px 0 0; padding: 22px 0; border-top: 1px solid rgba(30,58,95,0.08); border-bottom: 1px solid rgba(30,58,95,0.08); }
+    .school-track { display: flex; gap: 54px; width: max-content; animation: mq 32s linear infinite; align-items: baseline; }
+    .school-track span {
+      font-family: var(--font-serif); font-size: 30px; font-weight: 600;
+      color: #C9CFD8; white-space: nowrap; letter-spacing: 0.01em;
+    }
+    @keyframes mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* stats */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin: 44px 0 0; }
+    .stat { text-align: center; padding: 26px 10px; }
+    .stat .num {
+      font-family: var(--font-serif); font-size: clamp(40px, 5vw, 54px); font-weight: 600;
+      color: var(--klein); line-height: 1; letter-spacing: -0.02em;
+    }
+    .stat .num sup { font-size: 0.45em; vertical-align: super; }
+    .stat .lbl { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-top: 10px; }
+
+    /* ===== Live showcase ===== */
+    .showcase { margin: 70px 0; }
+    .showcase-head { text-align: center; margin-bottom: 26px; }
+    .showcase-head .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--klein); }
+    .showcase-head h2 {
+      font-family: var(--font-serif); font-size: clamp(24px, 4vw, 32px); font-weight: 600;
+      color: var(--klein); margin: 8px 0 8px; letter-spacing: -0.01em;
+    }
+    .showcase-head p { color: var(--text-secondary); font-size: 14px; margin: 0; }
+    .browser {
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid rgba(30,58,95,0.1);
+      box-shadow: 0 24px 70px rgba(10,37,64,0.16), 0 2px 12px rgba(10,37,64,0.06);
+      background: #fff;
+    }
+    .browser-chrome {
+      display: flex; align-items: center; gap: 14px;
+      padding: 13px 18px; background: #F3F4F6; border-bottom: 1px solid #ECECEC;
+    }
+    .browser-dots { display: flex; gap: 7px; flex-shrink: 0; }
+    .browser-dots span { width: 11px; height: 11px; border-radius: 50%; }
+    .browser-dots .r { background: #FF5F57; } .browser-dots .y { background: #FEBC2E; } .browser-dots .g { background: #28C840; }
+    .browser-url {
+      flex: 1; display: flex; align-items: center; gap: 8px;
+      background: #fff; border: 1px solid #E5E7EB; border-radius: 8px;
+      padding: 6px 14px; font-family: var(--font-mono); font-size: 11.5px; color: #374151; min-width: 0;
+    }
+    .browser-url .lock { color: #9CA3AF; flex-shrink: 0; }
+    .browser-url .path { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .browser-url .live { margin-left: auto; flex-shrink: 0; color: #2FA36B; font-size: 9.5px; letter-spacing: 0.08em; display: inline-flex; align-items: center; gap: 5px; }
+    .browser-url .live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #2FA36B; }
+    .browser-stage { height: 820px; background: #fff; }
+    .browser-stage iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+
+    /* ===== Highlights ===== */
+    .highlights { margin: 80px 0 40px; }
+    .hl-head { text-align: center; margin-bottom: 40px; }
+    .hl-head .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--klein); }
+    .hl-head h2 { font-family: var(--font-serif); font-size: clamp(24px, 4vw, 32px); font-weight: 600; color: var(--klein); margin: 8px 0 0; }
+    .hl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .hl-card {
+      border-radius: 16px; padding: 30px 26px;
+      border: 1px solid rgba(30,58,95,0.1); background: var(--bg-card);
+      transition: transform 0.22s, box-shadow 0.22s;
+    }
+    .hl-card:hover { transform: translateY(-6px); box-shadow: 0 18px 40px rgba(10,37,64,0.1); }
+    .hl-card .ico { font-size: 32px; line-height: 1; }
+    .hl-card h3 { font-family: var(--font-serif); font-size: 22px; font-weight: 600; color: var(--klein); margin: 16px 0 8px; letter-spacing: -0.01em; }
+    .hl-card p { font-size: 13.5px; line-height: 1.7; color: var(--text-secondary); margin: 0; }
+
+    /* ===== Walkthrough: alternating real pages ===== */
+    .section-label-row {
+      display: flex; align-items: center; gap: 16px; margin: 84px 0 44px;
+    }
+    .section-label-row span {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--klein); white-space: nowrap;
+    }
+    .section-label-row::after { content: ''; flex: 1; height: 1px; background: rgba(30,58,95,0.1); }
+
+    .feature-row {
+      display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 56px; align-items: flex-start;
+      margin-bottom: 96px;
+    }
+    .feature-row.reverse .feature-media { order: 2; }
+    .feature-row.reverse .feature-text { order: 1; }
+
+    .feature-label {
+      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
+      letter-spacing: 0.1em; color: var(--klein); margin-bottom: 8px;
+    }
+    .feature-title {
+      font-family: var(--font-serif); font-size: clamp(21px, 3vw, 27px);
+      font-weight: 600; margin-bottom: 14px; letter-spacing: -0.01em; line-height: 1.3;
+    }
+    .feature-desc {
+      font-size: 14.5px; line-height: 1.85; color: var(--text-secondary); margin-bottom: 12px;
+    }
+    .feature-bullets {
+      list-style: none; padding: 0; display: flex; flex-direction: column; gap: 9px;
+      margin-bottom: 16px;
+    }
+    .feature-bullets li {
+      font-size: 14px; color: var(--text-secondary); line-height: 1.6;
+      padding-left: 16px; position: relative;
+    }
+    .feature-bullets li::before {
+      content: ''; position: absolute; left: 0; top: 9px;
+      width: 5px; height: 5px; border-radius: 50%; background: var(--klein); opacity: 0.4;
+    }
+    .open-page {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font-mono); font-size: 11px; color: var(--klein);
+      text-decoration: none; border-bottom: 1px solid rgba(30,58,95,0.25); padding-bottom: 2px;
+    }
+    .open-page:hover { border-color: var(--klein); }
+
+    .mini-browser {
+      border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(30,58,95,0.1);
+      box-shadow: 0 16px 44px rgba(10,37,64,0.12), 0 2px 8px rgba(10,37,64,0.05);
+      background: #fff;
+    }
+    .mb-bar {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 14px; background: #F3F4F6; border-bottom: 1px solid #ECECEC;
+      font-family: var(--font-mono); font-size: 10.5px; color: #6B7280;
+    }
+    .mb-bar .lock { flex-shrink: 0; }
+    .mb-bar .path { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #374151; }
+    .mb-bar .live {
+      flex-shrink: 0; color: #2FA36B; font-size: 9px; letter-spacing: 0.08em;
+      display: inline-flex; align-items: center; gap: 5px;
+    }
+    .mb-bar .live::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #2FA36B; }
+    .mb-stage { height: 640px; background: #fff; }
+    .mb-stage iframe { width: 100%; height: 100%; border: 0; display: block; background: #fff; }
+    .mb-stage.tall { height: 720px; }
+
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .hl-grid { grid-template-columns: 1fr; }
+      .browser-stage { height: 540px; }
+      .school-track span { font-size: 22px; }
+      .feature-row { grid-template-columns: 1fr; gap: 28px; }
+      .feature-row.reverse .feature-media { order: 1; }
+      .feature-row.reverse .feature-text { order: 2; }
+      .mb-stage { height: 480px; }
+      .mb-stage.tall { height: 520px; }
+    }
+  </style>
+</head>
+<body style="background:var(--bg);">
+
+<section class="project-page">
+  <div class="section-container">
+
+    <a href="index.html#projects" class="project-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Projects
+    </a>
+
+    <!-- Hero -->
+    <div class="hero">
+      <div class="demo-banner">🚧 正在筹备中 · 此为 demo</div>
+      <h1>不做中介，做「过来人」</h1>
+
+      <div class="school-marquee">
+        <div class="school-track">
+          <span>Harvard</span><span>Stanford</span><span>MIT</span><span>Oxford</span><span>Cambridge</span><span>Yale</span><span>Columbia</span><span>UPenn</span><span>Cornell</span><span>Princeton</span><span>UChicago</span><span>UC Berkeley</span><span>UCLA</span><span>NYU</span>
+          <span>Harvard</span><span>Stanford</span><span>MIT</span><span>Oxford</span><span>Cambridge</span><span>Yale</span><span>Columbia</span><span>UPenn</span><span>Cornell</span><span>Princeton</span><span>UChicago</span><span>UC Berkeley</span><span>UCLA</span><span>NYU</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Live showcase -->
+    <div class="showcase">
+      <div class="browser">
+        <div class="browser-chrome">
+          <div class="browser-dots"><span class="r"></span><span class="y"></span><span class="g"></span></div>
+          <div class="browser-url">
+            <span class="lock">🔒</span>
+            <span class="path">https://jessiedong-hk.github.io/mentorship-website/</span>
+            <span class="live">LIVE</span>
+          </div>
+        </div>
+        <div class="browser-stage">
+          <iframe src="https://jessiedong-hk.github.io/mentorship-website/" title="过来人Mentor 品牌官网" loading="lazy" referrerpolicy="no-referrer"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highlights -->
+    <div class="highlights">
+      <div class="hl-head">
+        <div class="tag">亮点</div>
+        <h2>它好在哪</h2>
+      </div>
+      <div class="hl-grid">
+        <div class="hl-card">
+          <div class="ico">🚫</div>
+          <h3>不做中介</h3>
+          <p>不代写、不流水线。带你写文书、做活动，只解决你最痛的那几个问题。</p>
+        </div>
+        <div class="hl-card">
+          <div class="ico">🎓</div>
+          <h3>真·过来人</h3>
+          <p>导师自己就是申上名校的人——哈佛、斯坦福、牛剑的学长学姐，不是销售。</p>
+        </div>
+        <div class="hl-card">
+          <div class="ico">☕️</div>
+          <h3>一杯咖啡的钱</h3>
+          <p>单次咨询 ¥500 起。中介最值钱的那一步——匹配到梦校学长学姐——不用再花几十万。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Walkthrough: the other key pages -->
+    <div class="section-label-row"><span>Site Walkthrough</span></div>
+
+    <!-- About Us -->
+    <div class="feature-row">
+      <div class="feature-media">
+        <div class="mini-browser">
+          <div class="mb-bar">
+            <span class="lock">🔒</span>
+            <span class="path">…/mentorship-website/about.html</span>
+            <span class="live">LIVE</span>
+          </div>
+          <div class="mb-stage">
+            <iframe src="https://jessiedong-hk.github.io/mentorship-website/about.html" title="About Us" loading="lazy" referrerpolicy="no-referrer"></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">01</div>
+        <div class="feature-title">关于我们</div>
+        <p class="feature-desc">
+          想快速成长，最好的捷径就是「偷师」——帮大家把信息壁垒打通，少走弯路，以最快的速度一起成长。
+        </p>
+        <a class="open-page" href="https://jessiedong-hk.github.io/mentorship-website/about.html" target="_blank" rel="noopener">打开 About ↗</a>
+      </div>
+    </div>
+
+    <!-- Mentor List -->
+    <div class="feature-row reverse">
+      <div class="feature-media">
+        <div class="mini-browser">
+          <div class="mb-bar">
+            <span class="lock">🔒</span>
+            <span class="path">…/mentorship-website/platform.html</span>
+            <span class="live">LIVE</span>
+          </div>
+          <div class="mb-stage">
+            <iframe src="https://jessiedong-hk.github.io/mentorship-website/platform.html" title="Our Mentors" loading="lazy" referrerpolicy="no-referrer"></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">02</div>
+        <div class="feature-title">找到心仪的 Mentor</div>
+        <p class="feature-desc">
+          每一位过来人导师都亲历过申请季的酸甜苦辣，用他们的经验照亮你的升学之路。
+        </p>
+        <a class="open-page" href="https://jessiedong-hk.github.io/mentorship-website/platform.html" target="_blank" rel="noopener">打开导师列表 ↗</a>
+      </div>
+    </div>
+
+    <!-- Mentor Profile -->
+    <div class="feature-row">
+      <div class="feature-media">
+        <div class="mini-browser">
+          <div class="mb-bar">
+            <span class="lock">🔒</span>
+            <span class="path">…/mentorship-website/mentors/mia.html</span>
+            <span class="live">LIVE</span>
+          </div>
+          <div class="mb-stage tall">
+            <iframe src="https://jessiedong-hk.github.io/mentorship-website/mentors/mia.html" title="Mentor Profile · Mia" loading="lazy" referrerpolicy="no-referrer"></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">03</div>
+        <div class="feature-title">Mentor Profile</div>
+        <p class="feature-desc">
+          点进去看一位导师的「来时路」——从哪转到哪、能帮你什么、带出过什么结果。
+        </p>
+        <a class="open-page" href="https://jessiedong-hk.github.io/mentorship-website/mentors/mia.html" target="_blank" rel="noopener">打开 Mia 主页 ↗</a>
+      </div>
+    </div>
+
+    <!-- Become a Mentor -->
+    <div class="feature-row reverse">
+      <div class="feature-media">
+        <div class="mini-browser">
+          <div class="mb-bar">
+            <span class="lock">🔒</span>
+            <span class="path">…/mentorship-website/recruit.html</span>
+            <span class="live">LIVE</span>
+          </div>
+          <div class="mb-stage tall">
+            <iframe src="https://jessiedong-hk.github.io/mentorship-website/recruit.html" title="Become a Mentor" loading="lazy" referrerpolicy="no-referrer"></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="feature-text">
+        <div class="feature-label">04</div>
+        <div class="feature-title">成为一个 Mentor</div>
+        <p class="feature-desc">
+          把你的经验利用起来，帮学弟学妹打破信息差，顺便赚点零花钱。
+        </p>
+        <a class="open-page" href="https://jessiedong-hk.github.io/mentorship-website/recruit.html" target="_blank" rel="noopener">打开招募页 ↗</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</body>
+</html>
