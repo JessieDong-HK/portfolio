@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K-Pop Dancer · Jess Dong</title>
+  <meta name="description" content="Jess 的 K-pop 舞蹈——VERILUNE 舞团成员，跳舞 + 拍摄剪辑。" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Caveat:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500;700&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* ============ 黑粉撞色主题 ============ */
+    :root {
+      --kp-bg: #0a0a0e;
+      --kp-card: #14141b;
+      --kp-pink: #ff2d78;
+      --kp-pink-soft: #ff7ab8;
+      --kp-text: #f5f5f7;
+      --kp-muted: #9a9aa3;
+      --kp-border: rgba(255,255,255,0.09);
+    }
+    body.kpop-page {
+      background: var(--kp-bg);
+      color: var(--kp-text);
+    }
+    .kpop-page a { color: inherit; }
+
+    .kpop-wrap {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px 140px;
+    }
+
+    /* Back */
+    .kpop-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--kp-muted);
+      text-decoration: none;
+      margin: 60px 0 0;
+      transition: color 0.2s;
+    }
+    .kpop-back:hover { color: var(--kp-pink); }
+    .kpop-back svg { width: 14px; height: 14px; }
+
+    /* ============ HERO ============ */
+    .kpop-hero {
+      position: relative;
+      padding: 100px 0 90px;
+      overflow: hidden;
+    }
+    .kpop-hero::before {
+      content: '';
+      position: absolute;
+      top: -140px; right: -120px;
+      width: 460px; height: 460px;
+      background: radial-gradient(circle, rgba(255,45,120,0.28), transparent 65%);
+      filter: blur(10px);
+      pointer-events: none;
+    }
+    .kpop-hero-kicker {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--kp-pink);
+      margin-bottom: 20px;
+    }
+    .kpop-hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(3rem, 9vw, 6.5rem);
+      font-weight: 400;
+      line-height: 1.02;
+      margin: 0 0 18px;
+      background: linear-gradient(120deg, #fff 10%, var(--kp-pink) 55%, var(--kp-pink-soft));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+    .kpop-hero-handle {
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      letter-spacing: 5px;
+      color: var(--kp-pink-soft);
+      margin: 0 0 28px;
+    }
+    .kpop-hero-intro {
+      max-width: 680px;
+      font-size: 1.05rem;
+      line-height: 1.9;
+      color: var(--kp-muted);
+      margin: 0 0 18px;
+    }
+    .kpop-hero-intro:last-of-type {
+      margin-bottom: 40px;
+    }
+    .kpop-hero-intro em {
+      font-style: normal;
+      color: var(--kp-pink-soft);
+    }
+    .kpop-hero-stats {
+      display: flex;
+      gap: 56px;
+      flex-wrap: wrap;
+    }
+    .kpop-hero-stat {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .kpop-hero-stat b {
+      font-family: var(--font-mono);
+      font-size: 30px;
+      font-weight: 500;
+      color: var(--kp-pink);
+    }
+    .kpop-hero-stat span {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--kp-muted);
+    }
+
+    /* ============ 场次分组 ============ */
+    .kpop-stage {
+      margin-bottom: 96px;
+    }
+    .kpop-stage-head {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--kp-border);
+    }
+    .kpop-stage-num {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--kp-pink);
+      letter-spacing: 0.1em;
+    }
+    .kpop-stage-title {
+      font-family: var(--font-serif);
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 400;
+      margin: 0;
+      color: var(--kp-text);
+    }
+    .kpop-stage-role {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--kp-muted);
+      margin-left: auto;
+    }
+
+    /* 主视频大封面 */
+    .kpop-stage-feature {
+      position: relative;
+      display: block;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--kp-border);
+      text-decoration: none;
+      background: var(--kp-card);
+    }
+    .kpop-stage-feature img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.22,1,0.36,1);
+    }
+    .kpop-stage-feature:hover img { transform: scale(1.05); }
+    .kpop-stage-feature::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.72) 0%, transparent 55%);
+      pointer-events: none;
+    }
+    .kpop-play {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      background: var(--kp-pink);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 0 0 rgba(255,45,120,0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      z-index: 2;
+    }
+    .kpop-stage-feature:hover .kpop-play {
+      transform: translate(-50%, -50%) scale(1.08);
+      box-shadow: 0 0 0 18px rgba(255,45,120,0);
+    }
+    .kpop-play svg { width: 26px; height: 26px; }
+    .kpop-feature-meta {
+      position: absolute;
+      left: 22px; bottom: 18px;
+      z-index: 2;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      color: rgba(255,255,255,0.9);
+    }
+
+    /* 附加物料：side cam + 照片 */
+    .kpop-stage-assets {
+      display: grid;
+      grid-template-columns: 0.9fr 1.6fr;
+      gap: 16px;
+      margin-top: 16px;
+      align-items: stretch;
+    }
+    .kpop-stage-sidecam {
+      position: relative;
+      display: block;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--kp-border);
+      text-decoration: none;
+      background: var(--kp-card);
+    }
+    .kpop-stage-sidecam img {
+      width: 100%;
+      height: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+    }
+    .kpop-stage-sidecam:hover img { transform: scale(1.06); }
+    .kpop-stage-sidecam::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent 60%);
+    }
+    .kpop-sidecam-label {
+      position: absolute;
+      left: 16px; bottom: 14px;
+      z-index: 2;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: rgba(255,255,255,0.9);
+    }
+    .kpop-sidecam-play {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(255,45,120,0.9);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 2;
+    }
+    .kpop-sidecam-play svg { width: 18px; height: 18px; }
+
+    .kpop-stage-photos {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    .kpop-stage-photos img {
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid var(--kp-border);
+      transition: transform 0.35s ease, border-color 0.35s ease;
+    }
+    .kpop-stage-photos img:hover {
+      transform: scale(1.04);
+      border-color: var(--kp-pink);
+    }
+
+    /* ============ GOLD 场：镜头之后 ============ */
+    .kpop-lens {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 22px 26px;
+      border: 1px solid rgba(255,45,120,0.35);
+      border-radius: 14px;
+      background: rgba(255,45,120,0.07);
+      margin-bottom: 22px;
+    }
+    .kpop-lens-badge {
+      flex-shrink: 0;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--kp-pink);
+      writing-mode: vertical-rl;
+      padding: 6px 4px;
+    }
+    .kpop-lens-text {
+      font-size: 1.02rem;
+      line-height: 1.7;
+      color: var(--kp-text);
+      margin: 0;
+    }
+    .kpop-lens-text em {
+      font-style: normal;
+      color: var(--kp-pink-soft);
+    }
+
+    /* ============ Instagram ============ */
+    .kpop-ig {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 13px 22px;
+      border: 1px solid rgba(255,45,120,0.45);
+      border-radius: 100px;
+      text-decoration: none;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      color: var(--kp-pink-soft);
+      transition: all 0.25s ease;
+      margin-top: 20px;
+    }
+    .kpop-ig:hover {
+      background: var(--kp-pink);
+      color: #fff;
+      border-color: var(--kp-pink);
+    }
+    .kpop-ig svg { width: 17px; height: 17px; }
+
+    @media (max-width: 768px) {
+      .kpop-stage-assets {
+        grid-template-columns: 1fr;
+      }
+      .kpop-stage-photos {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .kpop-hero-stats { gap: 32px; }
+      .kpop-stage-role { margin-left: 0; }
+    }
+  </style>
+</head>
+<body class="kpop-page">
+
+<div class="kpop-wrap">
+
+  <!-- Back -->
+  <a href="index.html" class="kpop-back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+    Index
+  </a>
+
+  <!-- Hero -->
+  <header class="kpop-hero">
+    <p class="kpop-hero-kicker">K-Pop</p>
+    <h1 class="kpop-hero-title">K-Pop Dancer</h1>
+    <p class="kpop-hero-intro">
+      小学三四年级，韩流刚刚兴起、少女时代《Gee》火起来那会儿，我接触到了 K-pop——
+      <em>“天呐她们好美！歌好好听！我也想变成她们那样！”</em>
+      那时候我周围没有其他人跳舞，更没有现在遍地的舞房，我就每天自己在家，看着视频对着镜子，照猫画虎地学起来，一直自己跳到大学，才找到同样跳 K-pop 的伙伴。
+    </p>
+    <p class="kpop-hero-intro">
+      这样算来，我已经陆续跳 K-pop <em>15 年</em>了（OMG，居然这么久了）。K-pop 是世界上最好的爱好之一——
+      去到任何国家的大城市，都能找到 K-pop cover group（我参加过的有：纽约、洛杉矶、新加坡、北京、上海、深圳、广州），
+      很快就能融入当地人成为朋友，一起跳舞、一起出汗产生多巴胺，休息时坐在地上一起喝奶茶、一起表演，真的不要太快乐！
+    </p>
+    <p class="kpop-hero-intro">
+      现在舞房遍地，跳舞变得方便太多了！除了 K-pop，我还跳各种其他舞种：Jazz、Hip-Hop、Heels、古典、肚皮舞、芭蕾。
+    </p>
+    <div class="kpop-hero-stats">
+      <div class="kpop-hero-stat"><b>15 年</b><span>跳 K-pop</span></div>
+      <div class="kpop-hero-stat"><b>3.7M+</b><span>视频播放</span></div>
+      <div class="kpop-hero-stat"><b>90K+</b><span>粉丝</span></div>
+    </div>
+  </header>
+
+  <!-- ============ 场次 01：La Vie en Rose ============ -->
+  <section class="kpop-stage">
+    <div class="kpop-stage-head">
+      <span class="kpop-stage-num">01</span>
+      <h2 class="kpop-stage-title">IZ*ONE — La Vie en Rose</h2>
+      <span class="kpop-stage-role">Eunbi 位 · 路演</span>
+    </div>
+
+    <a class="kpop-stage-feature" href="https://youtu.be/rUCqbrDQY9E" target="_blank">
+      <img src="assets/kpop-06.jpg" alt="La Vie en Rose 正式视频" loading="lazy" />
+      <span class="kpop-play">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+      <span class="kpop-feature-meta">正式视频 · 4:32 · 8.1K views</span>
+    </a>
+
+    <div class="kpop-stage-assets">
+      <a class="kpop-stage-sidecam" href="https://youtu.be/7TatKaDOQig" target="_blank">
+        <img src="assets/kpop-07.jpg" alt="La Vie en Rose Side Cam" loading="lazy" />
+        <span class="kpop-sidecam-play">
+          <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+        </span>
+        <span class="kpop-sidecam-label">Side Cam · 我拍 + 剪辑 · 4:17</span>
+      </a>
+      <div class="kpop-stage-photos">
+        <img src="assets/roadshow-01.jpg" alt="路演现场" loading="lazy" />
+        <img src="assets/roadshow-02.jpg" alt="路演现场" loading="lazy" />
+        <img src="assets/roadshow-03.jpg" alt="路演现场" loading="lazy" />
+        <img src="assets/roadshow-04.jpg" alt="路演现场" loading="lazy" />
+        <img src="assets/roadshow-05.jpg" alt="路演现场" loading="lazy" />
+        <img src="assets/roadshow-06.jpg" alt="路演现场" loading="lazy" />
+        <img src="assets/roadshow-07.jpg" alt="路演现场" loading="lazy" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 场次 02：LATATA ============ -->
+  <section class="kpop-stage">
+    <div class="kpop-stage-head">
+      <span class="kpop-stage-num">02</span>
+      <h2 class="kpop-stage-title">(G)I-DLE — LATATA</h2>
+      <span class="kpop-stage-role">Minnie 位</span>
+    </div>
+
+    <a class="kpop-stage-feature" href="https://youtu.be/4DDYtUF2iDk" target="_blank">
+      <img src="assets/kpop-02.jpg" alt="LATATA 正式视频" loading="lazy" />
+      <span class="kpop-play">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+      <span class="kpop-feature-meta">正式视频 · 1TAKE · 3:28 · 1.5K views</span>
+    </a>
+
+    <div class="kpop-stage-assets">
+      <a class="kpop-stage-sidecam" href="https://youtu.be/_ULSX_pfybw" target="_blank">
+        <img src="assets/kpop-04.jpg" alt="LATATA Side Cam" loading="lazy" />
+        <span class="kpop-sidecam-play">
+          <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+        </span>
+        <span class="kpop-sidecam-label">Side Cam · 3:30</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ 场次 03：Attention ============ -->
+  <section class="kpop-stage">
+    <div class="kpop-stage-head">
+      <span class="kpop-stage-num">03</span>
+      <h2 class="kpop-stage-title">NewJeans — Attention</h2>
+      <span class="kpop-stage-role">Haerin 位</span>
+    </div>
+
+    <a class="kpop-stage-feature" href="https://youtu.be/pilbu8rSZ4Q" target="_blank">
+      <img src="assets/kpop-03.jpg" alt="Attention 正式视频" loading="lazy" />
+      <span class="kpop-play">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+      <span class="kpop-feature-meta">正式视频 · 3:01 · 429 views</span>
+    </a>
+
+    <div class="kpop-stage-assets">
+      <a class="kpop-stage-sidecam" href="https://youtu.be/C8Tck3o5UhY" target="_blank">
+        <img src="assets/kpop-05.jpg" alt="Attention Side Cam" loading="lazy" />
+        <span class="kpop-sidecam-play">
+          <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+        </span>
+        <span class="kpop-sidecam-label">Side Cam · 2:55</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============ 场次 04：HELLO VENUS ============ -->
+  <section class="kpop-stage">
+    <div class="kpop-stage-head">
+      <span class="kpop-stage-num">04</span>
+      <h2 class="kpop-stage-title">HELLO VENUS — Wiggle Wiggle</h2>
+      <span class="kpop-stage-role">Galaxy Moonlight</span>
+    </div>
+
+    <a class="kpop-stage-feature" href="https://youtu.be/LvgGoUFW2Kc" target="_blank">
+      <img src="assets/kpop-01.jpg" alt="HELLO VENUS Wiggle Wiggle" loading="lazy" />
+      <span class="kpop-play">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+      <span class="kpop-feature-meta">3:35 · 1.6K views</span>
+    </a>
+  </section>
+
+  <!-- ============ 场次 05：GOLD（镜头之后） ============ -->
+  <section class="kpop-stage">
+    <div class="kpop-stage-head">
+      <span class="kpop-stage-num">05</span>
+      <h2 class="kpop-stage-title">ITZY — GOLD</h2>
+      <span class="kpop-stage-role">镜头之后</span>
+    </div>
+
+    <div class="kpop-lens">
+      <span class="kpop-lens-badge">Behind the Lens</span>
+      <p class="kpop-lens-text">
+        这一场我<em>担任摄影师 + 后期剪辑</em>。
+      </p>
+    </div>
+
+    <a class="kpop-stage-feature" href="https://youtu.be/QYmqaHSICos" target="_blank">
+      <img src="assets/kpop-08.jpg" alt="ITZY GOLD 正式视频" loading="lazy" />
+      <span class="kpop-play">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+      <span class="kpop-feature-meta">正式视频 · 3:10 · 275 views</span>
+    </a>
+
+    <div class="kpop-stage-assets">
+      <a class="kpop-stage-sidecam" href="https://youtu.be/orCS1WFhKug" target="_blank">
+        <img src="assets/kpop-09.jpg" alt="ITZY GOLD Side Cam" loading="lazy" />
+        <span class="kpop-sidecam-play">
+          <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+        </span>
+        <span class="kpop-sidecam-label">Side Cam · 3:07</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Instagram -->
+  <a href="https://www.instagram.com/reel/C_uPFwVSaKr/" class="kpop-ig" target="_blank">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.3" fill="currentColor" stroke="none"/></svg>
+    Instagram Reel
+  </a>
+
+</div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

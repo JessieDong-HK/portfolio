@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jess Dong · Journey</title>
+<style>
+  :root {
+    --ink: #111;
+    --muted: #6b7280;
+    --line: #d1d5db;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: #ffffff;
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+
+  /* ================= 地球视图（全屏） ================= */
+  #globeView {
+    position: fixed; inset: 0;
+    overflow: hidden;
+    background: #fff;
+  }
+  #globe { position: absolute; inset: 0; }
+
+  .content {
+    position: absolute; inset: 0;
+    z-index: 10;
+    display: flex; flex-direction: column;
+    height: 100vh;
+    padding: 4rem 2rem 3rem 3rem;
+    pointer-events: none;
+  }
+  .content h1 {
+    font-size: clamp(1.9rem, 4vw, 2.6rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 0.25rem 0;
+  }
+  .content .sub {
+    font-size: 0.85rem; letter-spacing: 0.28em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 2.6rem;
+  }
+  .album-list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem;
+    flex: 1;
+  }
+  .album-list li {
+    pointer-events: auto; cursor: pointer; max-width: fit-content;
+    font-size: clamp(1.35rem, 3.2vw, 1.9rem); font-weight: 500; letter-spacing: -0.01em;
+    line-height: 1.35; transition: color .18s ease;
+  }
+  .album-list li:hover { color: var(--muted); }
+
+  footer {
+    position: absolute; right: 1.6rem; bottom: 1.2rem; z-index: 10;
+    font-size: 0.82rem; letter-spacing: 0.05em; color: var(--muted); pointer-events: none;
+  }
+
+  /* 悬浮信息卡 */
+  .card {
+    position: fixed; z-index: 50; width: 240px; padding: 1rem;
+    background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px;
+    opacity: 0; transform: translateY(6px); pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease; overflow: hidden;
+    font-size: 1.15rem; line-height: 1.5;
+  }
+  .card.show { opacity: 0.85; transform: translateY(0); }
+  .card .title { display: inline-block; border-radius: 6px; padding: 0 4px; font-weight: 700; animation: blink 1.15s steps(1) infinite; }
+  @keyframes blink { 0%, 49% { background: transparent; } 50%, 100% { background: #fff; } }
+  .card .date { font-size: 0.8rem; color: var(--muted); }
+  .card .enter { font-size: 0.82rem; color: var(--muted); margin-top: 0.4rem; }
+  .card .marquee { overflow: hidden; white-space: nowrap; margin: 0.6rem 0; font-size: 0.95rem; }
+  .card .marquee-track { display: inline-flex; white-space: nowrap; animation: marquee 9s linear infinite; }
+  .card .marquee-track span { padding-right: 2.4rem; }
+  @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* ================= 详情视图（Journal） ================= */
+  #detailView {
+    position: fixed; inset: 0; z-index: 100;
+    background: #fff; overflow-y: auto;
+    opacity: 0; pointer-events: none;
+    transition: opacity .28s ease;
+  }
+  #detailView.open { opacity: 1; pointer-events: auto; }
+
+  .detail-layout {
+    display: flex; flex-direction: column;
+    min-height: 100vh;
+    padding: 0 0 3rem 0;
+  }
+  @media (min-width: 640px) {
+    .detail-layout { flex-direction: row; margin: 5rem 0; }
+  }
+
+  /* 左侧导航 */
+  .detail-nav {
+    padding: 2.5rem 1.5rem 0 1.5rem;
+    font-size: 1.125rem;
+  }
+  @media (min-width: 640px) {
+    .detail-nav { padding: 2.5rem 5rem 0 2.5rem; }
+  }
+  .detail-logo { margin: 0 0 2.5rem 0; }
+  .detail-logo a {
+    display: inline-block; color: var(--ink);
+    transition: color .2s ease;
+  }
+  .detail-logo a:hover { color: #dc2626; }
+  .detail-logo svg { width: 24px; height: 24px; display: block; }
+
+  .detail-list {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 0.2rem;
+    align-items: center;
+  }
+  @media (min-width: 640px) { .detail-list { align-items: flex-start; } }
+  .detail-list li { max-width: fit-content; }
+  .detail-list a { text-decoration: none; transition: color .15s ease; }
+  .detail-list a:hover { color: var(--muted); }
+  .detail-list a.current { font-weight: 700; }
+
+  .detail-meta {
+    list-style: none; margin: 0; padding: 0;
+    display: flex; flex-direction: column; gap: 0.2rem;
+    align-items: center;
+  }
+  @media (min-width: 640px) { .detail-meta { align-items: flex-start; margin-top: 2.5rem; } }
+  .detail-meta li { font-size: 0.9rem; }
+  .detail-meta a { text-decoration: none; color: #9ca3af; display: inline-flex; gap: 4px; align-items: center; transition: color .15s ease; }
+  .detail-meta a:hover { color: var(--muted); }
+  .detail-meta .hide-mobile { display: none; }
+  @media (min-width: 640px) { .detail-meta .hide-mobile { display: block; } }
+
+  /* 右侧 Journal */
+  .detail-journal {
+    display: flex; flex-direction: column; align-items: flex-start;
+    margin-top: 1.5rem; padding: 0 0.5rem;
+  }
+
+  .journal-card {
+    background: #f3f4f6; border-radius: 0.5rem;
+    margin: 0 auto; padding: 1rem 1.25rem;
+    width: calc(100% - 16px); max-width: 600px;
+  }
+  @media (min-width: 640px) { .journal-card { margin: 0; min-width: 400px; } }
+  .journal-pin { color: #9ca3af; pointer-events: none; }
+  .journal-pin svg { width: 24px; height: 24px; }
+  .journal-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 3rem; }
+  .journal-head h1 { font-weight: 400; font-size: 1.5rem; color: #4b5563; margin: 1rem 0 0 0; min-width: 8rem; }
+  .journal-badge { display: flex; align-items: flex-end; justify-content: flex-end; flex-wrap: wrap-reverse; gap: 0.5rem; }
+  .journal-badge span {
+    border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.25rem 0.75rem;
+    font-size: 0.875rem; color: var(--muted);
+  }
+
+  /* 照片墙（CSS columns 瀑布流） */
+  .masonry {
+    margin-top: 3rem;
+    width: 100%;
+    max-width: 1000px;
+    column-count: 2;
+    column-gap: 9px;
+  }
+  @media (min-width: 640px) { .masonry { column-count: 3; column-gap: 18px; } }
+  @media (min-width: 1280px) { .masonry { column-count: 4; } }
+  .masonry figure { margin: 0 0 18px 0; break-inside: avoid; }
+  .masonry img {
+    width: 100%; height: auto; display: block; border-radius: 4px;
+    cursor: zoom-in; background: #f3f4f6;
+  }
+
+  .totop {
+    padding-top: 1.5rem; font-size: 0.9rem; color: #9ca3af; text-decoration: none;
+    transition: color .15s ease;
+  }
+  .totop:hover { color: #4b5563; }
+
+  /* ================= 灯箱 ================= */
+  .photo-lb {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(5,6,10,.96);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .25s ease;
+  }
+  .photo-lb.open { opacity: 1; pointer-events: auto; }
+  .photo-lb img {
+    max-width: 88vw; max-height: 82vh; border-radius: 6px;
+    box-shadow: 0 30px 90px rgba(0,0,0,.7); object-fit: contain;
+  }
+  .photo-lb-close, .photo-lb-nav {
+    position: absolute; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
+    color: #fff; cursor: pointer; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s, transform .2s;
+  }
+  .photo-lb-close:hover, .photo-lb-nav:hover { background: rgba(255,255,255,.22); }
+  .photo-lb-close { top: 22px; right: 22px; width: 46px; height: 46px; font-size: 22px; }
+  .photo-lb-nav { top: 50%; transform: translateY(-50%); width: 54px; height: 54px; font-size: 24px; }
+  .photo-lb-nav:hover { transform: translateY(-50%) scale(1.07); }
+  .photo-lb-prev { left: 22px; }
+  .photo-lb-next { right: 22px; }
+  .photo-lb-count {
+    position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+    font-size: 12px; letter-spacing: .08em; color: rgba(255,255,255,.7);
+  }
+  .photo-lb-caption {
+    position: absolute; bottom: 54px; left: 50%; transform: translateX(-50%);
+    font-size: 17px; color: rgba(255,255,255,.92); text-align: center; max-width: 80vw;
+  }
+  @media (max-width: 640px) {
+    .content { padding: 2rem 1.5rem; align-items: center; }
+    .album-list { align-items: center; text-align: center; }
+    .card { display: none; }
+    .photo-lb-nav { width: 44px; height: 44px; font-size: 18px; }
+    .photo-lb-prev { left: 10px; } .photo-lb-next { right: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== 地球视图 ========== -->
+<div id="globeView">
+  <div id="globe"></div>
+  <section class="content">
+    <h1>Jess Dong</h1>
+    <div class="sub">Global Journey</div>
+    <ul class="album-list" id="albumList"></ul>
+  </section>
+  <footer>&copy; 2026</footer>
+  <div class="card" id="card">
+    <span class="title" id="cardTitle"></span>
+    <div class="date" id="cardDate"></div>
+    <div class="marquee"><div class="marquee-track" id="cardMarquee"></div></div>
+    <div class="enter">Click to enter &rarr;</div>
+  </div>
+</div>
+
+<!-- ========== 详情视图（Journal） ========== -->
+<div id="detailView">
+  <section class="detail-layout" id="detailTop">
+    <nav class="detail-nav">
+      <h1 class="detail-logo">
+        <a href="#" id="backHome" title="Back to globe">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.25" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+        </a>
+      </h1>
+      <ul class="detail-list" id="detailList"></ul>
+      <ul class="detail-meta">
+        <li><a href="#">About</a></li>
+        <li class="hide-mobile"><a href="#">Socials</a></li>
+      </ul>
+    </nav>
+
+    <div class="detail-journal">
+      <div class="journal-card">
+        <div class="journal-pin">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+        </div>
+        <div class="journal-head">
+          <h1 id="journalTitle"></h1>
+          <div class="journal-badge"><span id="journalDate"></span></div>
+        </div>
+      </div>
+      <div class="masonry" id="journalMasonry"></div>
+      <a href="#" class="totop" id="toTop">Go to top &uarr;</a>
+    </div>
+  </section>
+</div>
+
+<script src="assets/land-110m.js"></script>
+<script src="vendor/three.min.js"></script>
+<script src="vendor/globe.gl.min.js"></script>
+<script>
+(function () {
+  var root = document.getElementById('globe');
+  if (!root || typeof Globe === 'undefined' || typeof THREE === 'undefined') return;
+
+  function seq(id, n) {
+    return Array.from({ length: n }, function (_, i) { return id + '-' + String(i + 1).padStart(2, '0') + '.jpg'; });
+  }
+
+  // ---- 旅程地点（占位数据，之后替换为真实「去过的地方」） ----
+  var PLACES = [
+    { slug: 'singapore',   title: 'Singapore',   date: '2024', lat: 1.3521,  lng: 103.8198,
+      albums: [['ary',36], ['ditto',11], ['facial',21], ['ninja',6], ['sunday',10]] },
+    { slug: 'qinhuangdao', title: 'Qinhuangdao', date: '2023', lat: 39.940,  lng: 119.605,
+      albums: [['dawn',8]] },
+    { slug: 'dali',        title: 'Dali',        date: '2023', lat: 25.605,  lng: 100.270,
+      albums: [['fairy',4], ['lili',4]] },
+    { slug: 'california',  title: 'California',  date: '2022', lat: 34.4208, lng: -119.6982,
+      albums: [['wei',7]] }
+  ];
+
+  PLACES.forEach(function (p) {
+    p.photos = [];
+    p.albums.forEach(function (a) {
+      var id = a[0], n = a[1];
+      seq(id, n).forEach(function (f) {
+        p.photos.push({
+          id: id, file: f,
+          thumb: 'assets/photography/thumbs/' + f,
+          full: 'assets/photography/' + id + '/' + f
+        });
+      });
+    });
+  });
+
+  var isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  function rand(a, b) { return Math.random() * (b - a) + a; }
+
+  // ---- 点：每个地点一个红点 ----
+  var pointsData = PLACES.map(function (p) { return { lat: p.lat, lng: p.lng, radius: 0.19, place: p }; });
+
+  // ---- 弧线：地点两两相连 ----
+  var arcsData = [];
+  for (var i = 0; i < PLACES.length; i++) {
+    for (var j = i + 1; j < PLACES.length; j++) {
+      arcsData.push({
+        startLat: PLACES[i].lat, startLng: PLACES[i].lng,
+        endLat: PLACES[j].lat,   endLng: PLACES[j].lng,
+        color: ['red', 'red']
+      });
+    }
+  }
+
+  // ---- 环绕粒子 ----
+  var particles = [];
+  for (var k = 0; k < 500; k++) {
+    particles.push({ lat: (Math.random() - 0.5) * 180, lng: (Math.random() - 0.5) * 360, alt: 1.4 * Math.random() + 0.1 });
+  }
+
+  var globe = Globe({ rendererConfig: { antialias: true }, animateIn: false })(root)
+    .width(window.innerWidth)
+    .height(window.innerHeight)
+    .backgroundColor('rgba(0,0,0,0)')
+    .atmosphereColor('#ffffff')
+    .showGlobe(false)
+    .showAtmosphere(false)
+    .showGraticules(false)
+    .polygonsData(WORLD_LAND.features)
+    .polygonCapColor(function () { return 'rgba(255,255,255,0.77)'; })
+    .polygonSideColor(function () { return 'rgba(255,255,255,0)'; })
+    .polygonStrokeColor(function () { return isMac ? '#000000' : 'darkslategray'; })
+    .polygonAltitude(function () { return 0; })
+    .polygonsTransitionDuration(0)
+    .pointsData(pointsData)
+    .pointColor(function () { return 'rgba(255,0,0,0.75)'; })
+    .pointAltitude(0.002)
+    .pointRadius(function (d) { return d.radius; })
+    .pointsMerge(true)
+    .ringsData([])
+    .ringColor(function () { return ringColor; })
+    .ringMaxRadius('maxR')
+    .ringPropagationSpeed('propagationSpeed')
+    .ringRepeatPeriod('repeatPeriod')
+    .arcsData(arcsData)
+    .arcColor('color')
+    .arcDashLength(function () { return rand(0.06, 0.7); })
+    .arcDashGap(function () { return 10 * rand(0.025, 0.4); })
+    .arcDashAnimateTime(function () { return 20000 * rand(0.08, 0.8) + 500; })
+    .customLayerData(particles)
+    .customThreeObject(function () {
+      return new THREE.Mesh(
+        new THREE.SphereGeometry(0.22),
+        new THREE.MeshBasicMaterial({ color: '#777777', transparent: true, opacity: 0.25 })
+      );
+    })
+    .customThreeObjectUpdate(function (obj, d) {
+      obj.position.copy(globe.getCoords(d.lat, d.lng, d.alt));
+    });
+
+  window.photoGlobe = globe;
+
+  function ringColor(t) { return 'rgba(255,100,50,' + Math.sqrt(1 - t) + ')'; }
+
+  globe.onGlobeReady(function () {
+    var R = globe.getGlobeRadius();
+    var wire = new THREE.LineSegments(
+      new THREE.WireframeGeometry(new THREE.SphereGeometry(R, 60, 24)),
+      new THREE.LineBasicMaterial({ color: 'lightgrey', transparent: true, opacity: 0.35 })
+    );
+    globe.scene().add(wire);
+    var glass = new THREE.Mesh(
+      new THREE.SphereGeometry(R - 0.5, 64, 32),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.18 })
+    );
+    glass.renderOrder = Number.MAX_SAFE_INTEGER;
+    globe.scene().add(glass);
+  });
+
+  // ---- 地球视图：列表 hover 飞行 + 点击进入详情 ----
+  var listEl = document.getElementById('albumList');
+  PLACES.forEach(function (p) {
+    var li = document.createElement('li');
+    li.textContent = p.title;
+    li.addEventListener('mouseenter', function () { enter(p); });
+    li.addEventListener('mouseleave', function () { leave(); });
+    li.addEventListener('click', function () { openPlace(p); });
+    listEl.appendChild(li);
+  });
+
+  var card = document.getElementById('card');
+  var cardTitle = document.getElementById('cardTitle');
+  var cardDate = document.getElementById('cardDate');
+  var cardMarquee = document.getElementById('cardMarquee');
+
+  function enter(p) {
+    clearTimeout(leaveTimer);
+    globe.pointOfView({ lat: p.lat, lng: p.lng, altitude: 1 }, 1000);
+    forced = true;
+    controls.autoRotateSpeed = 0.69;
+    globe.ringsData([{ lat: p.lat, lng: p.lng, maxR: 9, propagationSpeed: 0.88, repeatPeriod: 1777 }]);
+    cardTitle.textContent = p.title;
+    cardDate.textContent = p.date;
+    var html = '';
+    for (var n = 0; n < 2; n++) html += '<span>' + p.title + ' · ' + p.photos.length + ' photos</span>';
+    cardMarquee.innerHTML = html;
+    card.style.left = 'calc(33% + ' + rand(10, 80).toFixed(0) + 'px)';
+    card.style.top = 'calc(33% + ' + rand(10, 50).toFixed(0) + 'px)';
+    card.classList.add('show');
+  }
+
+  var leaveTimer;
+  function leave() {
+    clearTimeout(leaveTimer);
+    leaveTimer = setTimeout(function () {
+      globe.pointOfView({ lat: 30, altitude: 2 }, 1000);
+      forced = false;
+      controls.autoRotateSpeed = 1.5;
+      globe.ringsData([]);
+      card.classList.remove('show');
+    }, 120);
+  }
+
+  // ---- 自转 ----
+  var controls = globe.controls();
+  controls.enabled = false;
+  controls.enableZoom = false;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 1.5;
+  var forced = false;
+  globe.pointOfView({ lat: 30, lng: -30, altitude: 2 }, 0);
+
+  (function tick() {
+    if (!forced) controls.autoRotateSpeed = 1.5;
+    controls.update();
+    requestAnimationFrame(tick);
+  })();
+
+  window.addEventListener('resize', function () {
+    globe.width(window.innerWidth).height(window.innerHeight);
+  });
+
+  // ---- 详情视图（Journal） ----
+  var detailView = document.getElementById('detailView');
+  var detailList = document.getElementById('detailList');
+  var journalTitle = document.getElementById('journalTitle');
+  var journalDate = document.getElementById('journalDate');
+  var journalMasonry = document.getElementById('journalMasonry');
+  var backHome = document.getElementById('backHome');
+  var toTop = document.getElementById('toTop');
+  var currentPlace = null;
+
+  // 左侧详情列表（与地球列表一致，可跳转其它地点）
+  PLACES.forEach(function (p) {
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.href = '#';
+    a.textContent = p.title;
+    a.dataset.slug = p.slug;
+    a.addEventListener('click', function (e) { e.preventDefault(); openPlace(p); });
+    li.appendChild(a);
+    detailList.appendChild(li);
+  });
+
+  function openPlace(p) {
+    currentPlace = p;
+    journalTitle.textContent = p.title;
+    journalDate.textContent = p.date;
+    journalMasonry.innerHTML = p.photos.map(function (ph, i) {
+      return '<figure><img src="' + ph.thumb + '" loading="lazy" data-idx="' + i + '" alt="' + p.title + ' photo ' + (i + 1) + '"></figure>';
+    }).join('');
+    // 高亮当前地点
+    Array.prototype.forEach.call(detailList.querySelectorAll('a'), function (a) {
+      a.classList.toggle('current', a.dataset.slug === p.slug);
+    });
+    detailView.classList.add('open');
+    detailView.scrollTop = 0;
+  }
+
+  function closePlace() {
+    detailView.classList.remove('open');
+  }
+  backHome.addEventListener('click', function (e) { e.preventDefault(); closePlace(); });
+  toTop.addEventListener('click', function (e) { e.preventDefault(); detailView.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  // ---- 灯箱 ----
+  var lb = document.createElement('div');
+  lb.className = 'photo-lb';
+  lb.innerHTML =
+    '<button class="photo-lb-close" aria-label="Close">&times;</button>' +
+    '<button class="photo-lb-nav photo-lb-prev" aria-label="Prev">&#10094;</button>' +
+    '<button class="photo-lb-nav photo-lb-next" aria-label="Next">&#10095;</button>' +
+    '<img src="" alt="">' +
+    '<div class="photo-lb-caption"></div>' +
+    '<div class="photo-lb-count"></div>';
+  document.body.appendChild(lb);
+
+  var lbImg = lb.querySelector('img');
+  var lbCaption = lb.querySelector('.photo-lb-caption');
+  var lbCount = lb.querySelector('.photo-lb-count');
+  var lbPhotos = [], lbTitle = '', lbIndex = 0;
+
+  function showLightbox(i) {
+    lbIndex = (i + lbPhotos.length) % lbPhotos.length;
+    lbImg.src = lbPhotos[lbIndex].full;
+    lbCaption.textContent = lbTitle;
+    lbCount.textContent = (lbIndex + 1) + ' / ' + lbPhotos.length;
+  }
+  function openLightbox(photos, title, index) {
+    lbPhotos = photos; lbTitle = title;
+    showLightbox(index);
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  lb.querySelector('.photo-lb-close').addEventListener('click', closeLightbox);
+  lb.querySelector('.photo-lb-prev').addEventListener('click', function () { showLightbox(lbIndex - 1); });
+  lb.querySelector('.photo-lb-next').addEventListener('click', function () { showLightbox(lbIndex + 1); });
+  lb.addEventListener('click', function (e) { if (e.target === lb) closeLightbox(); });
+  document.addEventListener('keydown', function (e) {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') showLightbox(lbIndex - 1);
+    else if (e.key === 'ArrowRight') showLightbox(lbIndex + 1);
+  });
+
+  journalMasonry.addEventListener('click', function (e) {
+    var img = e.target.closest('img');
+    if (!img || !currentPlace) return;
+    openLightbox(currentPlace.photos, currentPlace.title, parseInt(img.dataset.idx, 10));
+  });
+})();
+</script>
+</body>
+</html>

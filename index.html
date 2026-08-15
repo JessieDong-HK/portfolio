@@ -19,103 +19,352 @@
 
   <link rel="stylesheet" href="css/style.css" />
 
-  <!-- Photography: lightGallery (local) -->
-  <link rel="stylesheet" href="vendor/lightgallery-bundle.min.css" />
   <style>
-    /* ============ PHOTOGRAPHY ============ */
+    /* ============ PHOTOGRAPHY (3D Globe) ============ */
     #photography .section-container { max-width: 1160px; }
 
-    /* Overview */
-    .photo-overview {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 40px;
-      scroll-margin-top: 96px;
+    .photo-globe-wrap {
+      position: relative;
+      margin-top: 40px;
+      height: 640px;
+      border-radius: 20px;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 42%, #0e131a 0%, #05060a 72%);
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 40px 100px rgba(20,30,50,0.35);
     }
-    @media (max-width: 900px) { .photo-overview { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 560px) { .photo-overview { grid-template-columns: 1fr; } }
+    #photoGlobe { position: absolute; inset: 0; cursor: grab; }
+    #photoGlobe:active { cursor: grabbing; }
 
-    .photo-preview-card {
-      appearance: none; background: var(--bg-card); border: 1px solid var(--border);
-      padding: 0; cursor: pointer; text-align: left; border-radius: 12px; overflow: hidden;
-      box-shadow: var(--shadow); display: flex; flex-direction: column;
-      transition: transform .25s var(--ease-out), box-shadow .25s var(--ease-out);
+    .photo-globe-hint {
+      position: absolute; left: 24px; bottom: 20px; z-index: 3;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em;
+      text-transform: uppercase; color: rgba(255,255,255,.5);
+      pointer-events: none;
     }
-    .photo-preview-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(30,58,95,.14); }
+    .photo-globe-legend {
+      position: absolute; right: 24px; top: 20px; z-index: 3;
+      display: flex; flex-direction: column; gap: 9px;
+      font-family: var(--font-mono); font-size: 11px; letter-spacing: .06em;
+      color: rgba(255,255,255,.72);
+    }
+    .photo-globe-legend span { display: flex; align-items: center; gap: 8px; }
+    .photo-globe-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 
-    .preview-thumbs { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; aspect-ratio: 1/1; background: rgba(30,58,95,.06); }
-    .preview-thumbs img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .preview-thumbs.n1 { grid-template-columns: 1fr; aspect-ratio: 4/5; }
-    .preview-thumbs.n2 { grid-template-columns: 1fr 1fr; aspect-ratio: 2/1; }
-    .preview-thumbs.n3 img:first-child { grid-row: 1 / -1; }
+    /* globe tooltip */
+    .scene-tooltip {
+      background: rgba(12,16,22,.94) !important;
+      border: 1px solid rgba(255,255,255,.14) !important;
+      border-radius: 12px !important;
+      padding: 0 !important;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(0,0,0,.5) !important;
+    }
+    .globe-label { width: 190px; }
+    .globe-label img { width: 100%; height: 112px; object-fit: cover; display: block; }
+    .globe-label-body { padding: 10px 12px 12px; }
+    .globe-label-title { font-family: var(--font-serif); font-size: 15px; font-weight: 600; color: #f5f5f7; }
+    .globe-label-loc { font-family: var(--font-mono); font-size: 11px; letter-spacing: .04em; color: #9aa3ad; margin-top: 3px; }
 
-    .preview-meta { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 12px 14px; }
-    .preview-title { font-family: var(--font-serif); font-size: 17px; font-weight: 600; color: var(--klein); }
-    .preview-count { font-family: var(--font-mono); font-size: 11px; letter-spacing: .05em; color: var(--text-muted); white-space: nowrap; }
+    @media (max-width: 768px) {
+      .photo-globe-wrap { height: 460px; }
+      .photo-globe-legend { display: none; }
+      .photo-globe-hint { left: 16px; bottom: 14px; font-size: 10px; }
+    }
 
-    /* Detail (sidebar + spread) */
-    .photo-detail { margin-top: 40px; scroll-margin-top: 96px; }
-    .photo-back {
-      appearance: none; background: none; border: none; cursor: pointer;
+    /* Lightbox */
+    .photo-lb {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(5,6,10,.96);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity .25s ease;
+    }
+    .photo-lb.open { opacity: 1; pointer-events: auto; }
+    .photo-lb img {
+      max-width: 88vw; max-height: 82vh;
+      border-radius: 6px; box-shadow: 0 30px 90px rgba(0,0,0,.7);
+      object-fit: contain;
+    }
+    .photo-lb-close, .photo-lb-nav {
+      position: absolute; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.16);
+      color: #fff; cursor: pointer; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s, transform .2s;
+    }
+    .photo-lb-close:hover, .photo-lb-nav:hover { background: rgba(255,255,255,.22); }
+    .photo-lb-close { top: 22px; right: 22px; width: 46px; height: 46px; font-size: 22px; }
+    .photo-lb-nav { top: 50%; transform: translateY(-50%); width: 54px; height: 54px; font-size: 24px; }
+    .photo-lb-nav:hover { transform: translateY(-50%) scale(1.07); }
+    .photo-lb-prev { left: 22px; }
+    .photo-lb-next { right: 22px; }
+    .photo-lb-count {
+      position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; color: rgba(255,255,255,.7);
+    }
+    .photo-lb-caption {
+      position: absolute; bottom: 54px; left: 50%; transform: translateX(-50%);
+      font-family: var(--font-serif); font-size: 17px; color: rgba(255,255,255,.92); text-align: center;
+      max-width: 80vw;
+    }
+    @media (max-width: 768px) {
+      .photo-lb-nav { width: 44px; height: 44px; font-size: 18px; }
+      .photo-lb-prev { left: 10px; } .photo-lb-next { right: 10px; }
+    }
+
+    /* ============ JOURNEY (全球足迹 · Global Footprint globe) ============ */
+    .journey-section { padding: 0; overflow: hidden; }
+    .journey-wrap {
+      position: relative;
+      height: 100vh;
+      min-height: 640px;
+      background: #ffffff;
+      overflow: hidden;
+    }
+    #journeyGlobe { position: absolute; inset: 0; }
+
+    .journey-content {
+      position: absolute; inset: 0; z-index: 10;
+      display: flex; flex-direction: column;
+      height: 100%;
+      padding: 4rem 2rem 3rem 3rem;
+      pointer-events: none;
+    }
+    .journey-head { display: inline-flex; align-items: center; gap: 1rem; margin-bottom: 0.25rem; }
+    .journey-section .section-title-text { letter-spacing: 0.12em; }
+    .journey-sub {
+      font-family: var(--font-mono);
+      font-size: 0.82rem; letter-spacing: 0.28em; text-transform: uppercase;
+      color: #6b7280; margin: 0 0 2.6rem 0;
+    }
+    .journey-list {
+      list-style: none; margin: 0; padding: 0;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem;
+      flex: 1;
+    }
+    .journey-list li {
+      pointer-events: auto; cursor: pointer; max-width: fit-content;
+      font-size: clamp(1.35rem, 3.2vw, 1.9rem); font-weight: 500; letter-spacing: -0.01em;
+      line-height: 1.35; transition: color .18s ease;
+    }
+    .journey-list li:hover { color: #6b7280; }
+
+    .journey-hint {
+      position: absolute; right: 1.6rem; bottom: 1.2rem; z-index: 10;
+      font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase;
+      color: #9ca3af; pointer-events: none;
+    }
+
+    /* hover info card */
+    .journey-card {
+      position: absolute; z-index: 50; width: 240px; padding: 1rem;
+      background: #f3f4f6; border: 1px solid #e5e7eb; border-radius: 8px;
+      opacity: 0; transform: translateY(6px); pointer-events: none;
+      transition: opacity .22s ease, transform .22s ease; overflow: hidden;
+      font-size: 1.15rem; line-height: 1.5;
+    }
+    .journey-card.show { opacity: 0.85; transform: translateY(0); }
+    .journey-card .title { display: inline-block; border-radius: 6px; padding: 0 4px; font-weight: 700; animation: journey-blink 1.15s steps(1) infinite; }
+    @keyframes journey-blink { 0%, 49% { background: transparent; } 50%, 100% { background: #fff; } }
+    .journey-card .date { font-size: 0.8rem; color: #6b7280; }
+    .journey-card .enter { font-size: 0.82rem; color: #6b7280; margin-top: 0.4rem; }
+    .journey-card .marquee { overflow: hidden; white-space: nowrap; margin: 0.6rem 0; font-size: 0.95rem; }
+    .journey-card .marquee-track { display: inline-flex; white-space: nowrap; animation: journey-marquee 9s linear infinite; }
+    .journey-card .marquee-track span { padding-right: 2.4rem; }
+    @keyframes journey-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* detail view (journal) */
+    #journeyDetail {
+      position: fixed; inset: 0; z-index: 500;
+      background: #fff; overflow-y: auto;
+      opacity: 0; pointer-events: none;
+      transition: opacity .28s ease;
+    }
+    #journeyDetail.open { opacity: 1; pointer-events: auto; }
+
+    .journey-detail-layout {
+      display: flex; flex-direction: column;
+      min-height: 100vh;
+      padding: 0 0 3rem 0;
+    }
+    @media (min-width: 640px) { .journey-detail-layout { flex-direction: row; margin: 5rem 0; } }
+
+    .journey-detail-nav { padding: 2.5rem 1.5rem 0 1.5rem; font-size: 1.125rem; }
+    @media (min-width: 640px) { .journey-detail-nav { padding: 2.5rem 5rem 0 2.5rem; } }
+    .journey-detail-logo { margin: 0 0 2.5rem 0; }
+    .journey-detail-logo a { display: inline-block; color: #111; transition: color .2s ease; }
+    .journey-detail-logo a:hover { color: #dc2626; }
+    .journey-detail-logo svg { width: 24px; height: 24px; display: block; }
+
+    .journey-detail-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.2rem; align-items: center; }
+    @media (min-width: 640px) { .journey-detail-list { align-items: flex-start; } }
+    .journey-detail-list li { max-width: fit-content; }
+    .journey-detail-list a { text-decoration: none; transition: color .15s ease; }
+    .journey-detail-list a:hover { color: #6b7280; }
+    .journey-detail-list a.current { font-weight: 700; }
+
+    .journey-detail-meta { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.2rem; align-items: center; }
+    @media (min-width: 640px) { .journey-detail-meta { align-items: flex-start; margin-top: 2.5rem; } }
+    .journey-detail-meta li { font-size: 0.9rem; }
+    .journey-detail-meta a { text-decoration: none; color: #9ca3af; display: inline-flex; gap: 4px; align-items: center; transition: color .15s ease; }
+    .journey-detail-meta a:hover { color: #6b7280; }
+    .journey-detail-meta .hide-mobile { display: none; }
+    @media (min-width: 640px) { .journey-detail-meta .hide-mobile { display: block; } }
+
+    .journey-detail-journal { display: flex; flex-direction: column; align-items: flex-start; margin-top: 1.5rem; padding: 0 0.5rem; }
+
+    .journey-journal-card { background: #f3f4f6; border-radius: 0.5rem; margin: 0 auto; padding: 1rem 1.25rem; width: calc(100% - 16px); max-width: 600px; }
+    @media (min-width: 640px) { .journey-journal-card { margin: 0; min-width: 400px; } }
+    .journey-journal-pin { color: #9ca3af; pointer-events: none; }
+    .journey-journal-pin svg { width: 24px; height: 24px; }
+    .journey-journal-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 3rem; }
+    .journey-journal-head h1 { font-weight: 400; font-size: 1.5rem; color: #4b5563; margin: 1rem 0 0 0; min-width: 8rem; }
+    .journey-journal-badge { display: flex; align-items: flex-end; justify-content: flex-end; flex-wrap: wrap-reverse; gap: 0.5rem; }
+    .journey-journal-badge span { border: 1px solid #d1d5db; border-radius: 0.375rem; padding: 0.25rem 0.75rem; font-size: 0.875rem; color: #6b7280; }
+
+    .journey-masonry { margin-top: 3rem; width: 100%; max-width: 1000px; column-count: 2; column-gap: 9px; }
+    @media (min-width: 640px) { .journey-masonry { column-count: 3; column-gap: 18px; } }
+    @media (min-width: 1280px) { .journey-masonry { column-count: 4; } }
+    .journey-masonry figure { margin: 0 0 18px 0; break-inside: avoid; }
+    .journey-masonry img { width: 100%; height: auto; display: block; border-radius: 4px; cursor: zoom-in; background: #f3f4f6; }
+
+    .journey-totop { padding-top: 1.5rem; font-size: 0.9rem; color: #9ca3af; text-decoration: none; transition: color .15s ease; }
+    .journey-totop:hover { color: #4b5563; }
+
+    @media (max-width: 640px) {
+      .journey-content { padding: 2rem 1.5rem; align-items: center; }
+      .journey-list { align-items: center; text-align: center; }
+      .journey-card { display: none; }
+      .journey-hint { display: none; }
+    }
+
+    /* ========== MENTORSHIP (Flagship) ========== */
+    #mentorship { background: linear-gradient(180deg, #ffffff 0%, #F3EFE9 100%); }
+    .mentorship-vision {
+      font-size: clamp(1.5rem, 3.4vw, 2.4rem);
+      line-height: 1.35;
+      color: var(--text);
+      max-width: 780px;
+      margin: 0 0 40px;
+      letter-spacing: -0.01em;
+    }
+    .mentorship-vision em { color: var(--accent); font-style: normal; }
+    .mentorship-stats {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+      max-width: 780px; margin: 0 0 48px;
+    }
+    .mentorship-stat {
+      border: 1px solid var(--border); border-radius: var(--radius-lg);
+      padding: 22px 16px; text-align: center; background: var(--bg-card);
+    }
+    .mentorship-stat-val {
+      display: block; font-family: var(--font-serif); font-size: 2.2rem;
+      color: var(--klein); line-height: 1;
+    }
+    .mentorship-stat-label {
+      display: block; margin-top: 8px; font-family: var(--font-mono);
+      font-size: 11px; letter-spacing: 0.08em; color: var(--text-muted);
+      text-transform: uppercase;
+    }
+    .mentorship-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+    }
+    .mentorship-card {
+      border: 1px solid var(--border); border-radius: var(--radius-xl);
+      padding: 28px 24px; background: var(--bg-card);
+      box-shadow: var(--shadow-sm);
+      transition: transform .3s var(--ease-out), box-shadow .3s var(--ease-out);
+    }
+    .mentorship-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-blue); }
+    .mentorship-card-icon { font-size: 28px; margin-bottom: 14px; line-height: 1; }
+    .mentorship-card-title {
+      font-family: var(--font-serif); font-size: 1.15rem; font-weight: 600;
+      margin-bottom: 10px; color: var(--text);
+    }
+    .mentorship-card-desc { font-size: 13.5px; line-height: 1.7; color: var(--text-secondary); }
+    .mentorship-cta {
       display: inline-flex; align-items: center; gap: 8px;
-      font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em;
-      color: var(--text-muted); text-transform: uppercase; margin-bottom: 16px;
-      transition: color .2s;
+      margin-top: 44px; padding: 14px 28px;
+      font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+      text-transform: uppercase; color: #fff; background: var(--klein);
+      border-radius: 100px; transition: background .25s, transform .25s;
     }
-    .photo-back:hover { color: var(--klein); }
-
-    .photo-overview[hidden], .photo-detail[hidden] { display: none !important; }
-
-    .photo-layout {
-      display: flex; flex-direction: column; gap: 28px; margin-top: 0;
+    .mentorship-cta:hover { background: var(--accent); transform: translateY(-2px); }
+    .mentorship-cta svg { width: 14px; height: 14px; }
+    @media (max-width: 960px) {
+      .mentorship-stats { grid-template-columns: repeat(2, 1fr); }
+      .mentorship-grid { grid-template-columns: repeat(2, 1fr); }
     }
-    @media (min-width: 768px) {
-      .photo-layout { flex-direction: row; gap: 48px; align-items: flex-start; }
-    }
-
-    .photo-sidebar {
-      flex: 0 0 200px;
-      display: flex; flex-direction: column; gap: 4px;
-    }
-    @media (max-width: 767px) {
-      .photo-sidebar { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+    @media (max-width: 560px) {
+      .mentorship-grid { grid-template-columns: 1fr; }
     }
 
-    .photo-sidebar-label {
-      font-family: var(--font-mono); font-size: 10px; text-transform: uppercase;
-      letter-spacing: 0.12em; color: var(--text-muted); margin-bottom: 12px;
+    /* ============ PHOTOGRAPHY (Film Contact Sheet) ============ */
+    .film-contact {
+      background: #12100e;
+      border: 1px solid #000;
+      border-radius: 8px;
+      padding: 22px 22px 26px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.35);
     }
-    @media (max-width: 767px) { .photo-sidebar-label { width: 100%; margin-bottom: 0; } }
-
-    .photo-project {
-      appearance: none; background: none; border: none; cursor: pointer;
-      text-align: left; padding: 8px 12px; border-radius: 8px;
-      font-family: var(--font-serif); font-size: 18px; font-weight: 600;
-      color: var(--text-secondary); display: flex; align-items: baseline;
-      justify-content: space-between; gap: 12px;
-      transition: color .2s, background .2s;
+    .film-contact-bar {
+      display: flex; justify-content: space-between; align-items: baseline;
+      font-family: var(--font-mono); font-size: 11px; color: #d09a4e;
+      letter-spacing: .14em; padding-bottom: 12px; margin-bottom: 18px;
+      border-bottom: 1px solid #2a231c;
     }
-    .photo-project em {
-      font-family: var(--font-mono); font-style: normal; font-size: 11px;
-      letter-spacing: .05em; opacity: .5; white-space: nowrap;
+    .film-contact-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 720px) { .film-contact-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 440px) { .film-contact-grid { grid-template-columns: 1fr; } }
+
+    .fcell { display: block; perspective: 700px; text-decoration: none; }
+    .finner {
+      display: block; position: relative; transform-style: preserve-3d;
+      transition: transform .18s cubic-bezier(.16,.8,.3,1); will-change: transform;
     }
-    .photo-project:hover { color: var(--klein); }
-    .photo-project.active { color: var(--klein); background: rgba(30,58,95,.05); }
-    .photo-project.active em { opacity: .9; }
-
-    .photo-stage { flex: 1; min-width: 0; }
-    .photo-grid { display: none; }
-    .photo-grid.active { display: block; }
-
-    .photo-grid-inner { columns: 3 240px; column-gap: 16px; }
-    @media (max-width: 900px) { .photo-grid-inner { columns: 2 200px; } }
-    @media (max-width: 560px) { .photo-grid-inner { columns: 1; } }
-
-    .photo-item {
-      display: block; position: relative; margin: 0 0 16px; break-inside: avoid;
-      border-radius: 10px; overflow: hidden; cursor: zoom-in;
-      background: var(--bg-card); box-shadow: 0 1px 3px rgba(30,58,95,.08);
+    .fframe {
+      position: relative; display: block; border-radius: 6px; overflow: hidden;
+      background: #000; aspect-ratio: 1 / 1; box-shadow: 0 4px 14px rgba(0,0,0,.4);
     }
-    .photo-item img { width: 100%; display: block; transition: transform .5s var(--ease-out), opacity .3s; }
-    .photo-item:hover img { transform: scale(1.04); opacity: .92; }
+    .fimg {
+      position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+      filter: saturate(.82) contrast(1.05) brightness(.96);
+      transform: scale(1.06);
+      transition: filter .55s cubic-bezier(.2,.7,.3,1), transform .6s cubic-bezier(.2,.7,.3,1);
+    }
+    .fcell:hover .fimg { filter: saturate(1.02) contrast(1.04) brightness(1.0); transform: scale(1.02); }
+    .fcell .grain {
+      position: absolute; inset: 0; pointer-events: none; mix-blend-mode: overlay; opacity: .34;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+    .fcell .vignette {
+      position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 44%, rgba(0,0,0,.62) 100%);
+    }
+    .fcell .leak {
+      position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+      background:
+        radial-gradient(ellipse at 12% 4%, rgba(255,96,40,.50), transparent 46%),
+        radial-gradient(ellipse at 88% 96%, rgba(60,140,255,.22), transparent 50%);
+    }
+    .fcell .glare {
+      position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: 0;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255,242,222,.32), transparent 44%);
+      transition: opacity .35s ease;
+    }
+    .fcell:hover .glare { opacity: 1; }
+    .fno {
+      position: absolute; right: 8px; bottom: 6px;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; color: #ffb56b;
+      text-shadow: 0 1px 2px rgba(0,0,0,.7);
+    }
+    .flabel {
+      position: absolute; left: 10px; bottom: 8px; max-width: calc(100% - 46px);
+      font-family: var(--font-mono); font-size: 11px; color: #f0e6d8; letter-spacing: .04em;
+      opacity: 0; transform: translateY(6px); transition: opacity .35s ease, transform .35s ease;
+      text-shadow: 0 1px 3px rgba(0,0,0,.8); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fcell:hover .flabel { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 <body>
@@ -143,10 +392,12 @@
         <li><a href="#about">About</a></li>
         <li><a href="#experience">Experience</a></li>
         <li><a href="#projects">Projects</a></li>
+        <li><a href="#mentorship">Mentorship</a></li>
         <li><a href="#skills">Skills</a></li>
         <li><a href="#xhs">XHS</a></li>
         <li><a href="#photography">Photography</a></li>
-        <li><a href="#visuals">Life</a></li>
+        <li><a href="#journey">Journey</a></li>
+        <!-- <li><a href="#visuals">Life</a></li> -->
         <li><a href="#contact">Contact</a></li>
       </ul>
     </nav>
@@ -178,10 +429,13 @@
     <a href="#about" class="nav-bottom-item">About</a>
     <a href="#experience" class="nav-bottom-item">Experience</a>
     <a href="#projects" class="nav-bottom-item">Projects</a>
+    <a href="#mentorship" class="nav-bottom-item">Mentorship</a>
     <a href="#skills" class="nav-bottom-item">Skills</a>
     <a href="#xhs" class="nav-bottom-item">XHS</a>
     <a href="#photography" class="nav-bottom-item">Photography</a>
-    <a href="#visuals" class="nav-bottom-item">Life</a>
+    <a href="#journey" class="nav-bottom-item">Journey</a>
+    <!-- <a href="#visuals" class="nav-bottom-item">Life</a> -->
+    <a href="#kpop" class="nav-bottom-item">K-Pop</a>
     <a href="#contact" class="nav-bottom-item">Contact</a>
   </div>
 </nav>
@@ -217,36 +471,23 @@
       <div class="about-text-col">
         <div class="about-intro reveal">
           <p class="about-intro-line about-fade-line" style="--line-delay: 0s;">
-            I'm Jess Dong — <span class="about-bold-keyword">AI-native founder</span> building the future of education.
+            我叫 Jessie，目前就读港科大与耶鲁大学双学位管理学硕士，同时做自己的创业公司，主要聚焦 <span class="about-bold-keyword">AI + 教育</span> 和 <span class="about-bold-keyword">AI + 生物医药</span> 两大方向。
           </p>
-          <p class="about-intro-line about-fade-line" style="--line-delay: 0.2s;">
-            Data-trained at UCSB. Product-obsessed at HKUST.
+          <p class="about-intro-line about-fade-line" style="--line-delay: 0.15s;">
+            仅仅一年半之前，我还深陷对未来的迷茫，甚至在即将入读研究生的时候，人都到多伦多了却临时放弃。
           </p>
-          <p class="about-intro-line about-fade-line" style="--line-delay: 0.4s;">
-            I don't just talk about AI — <span class="about-bold-keyword">I ship products that real people use</span>.
+          <p class="about-intro-line about-fade-line" style="--line-delay: 0.3s;">
+            而一年半后的今天，我活成了自己理想中的模样：不为过去感到悔恨，也不为未来感到焦虑，真切地活在当下。每一天都过得十分充实，因为我每天都能实打实的推进项目，攻克的一个个难题，快速成长。
           </p>
-        </div>
-
-        <!-- Blurb cards -->
-        <div class="about-blurbs reveal">
-          <div class="about-blurb">
-            <div class="about-blurb-icon">🎓</div>
-            <div class="about-blurb-content">
-              <p><span class="about-bold-keyword">UCSB</span> — Double major in Economics & Statistics/Data Science. GPA 3.96/4.0, top 2%, Highest Honor, 8× Dean's List. Built the data foundation that powers everything I do today.</p>
-            </div>
-          </div>
-          <div class="about-blurb">
-            <div class="about-blurb-icon">🌏</div>
-            <div class="about-blurb-content">
-              <p><span class="about-bold-keyword">HKUST + LSE</span> — MSc International Management. Elected Student President, led a 15-member board across 7 countries. Built the university's first cross-school alliance connecting 400+ students with Deloitte, Microsoft, AWS, Tencent.</p>
-            </div>
-          </div>
-          <div class="about-blurb">
-            <div class="about-blurb-icon">🚀</div>
-            <div class="about-blurb-content">
-              <p>Now: <span class="about-bold-keyword">AI-native founder</span>. I build real products that solve real problems — CRM systems, AI interview platforms, progress tracking tools. No tutorials, no demos. Shipping is the standard.</p>
-            </div>
-          </div>
+          <p class="about-intro-line about-fade-line" style="--line-delay: 0.45s;">
+            我不再像从前那样躺在床上浑浑噩噩刷手机，并不是我强迫自己自律，而是当下的生活，是我发自内心热爱的。我穿梭在不同国家与城市之间，虽然日常工作时长常常达到 10-12 小时，但我并不觉得疲惫，反而工作越多越开心。
+          </p>
+          <p class="about-intro-line about-fade-line" style="--line-delay: 0.6s;">
+            我半年的目标是：把公司规模化，搭建起稳定的现金流。希望可以靠自己，在明年入读耶鲁时，独立承担 100 万的学费。
+          </p>
+          <p class="about-intro-line about-fade-line" style="--line-delay: 0.75s;">
+            我很乐于和志同道合的朋友分享我的全部经历，也期待和大家一起合作各类有意思的项目！So feel free to reach out to me at any time！
+          </p>
         </div>
       </div>
     </div>
@@ -299,7 +540,7 @@
     <div class="stagger-list reveal" id="staggerProjects">
       <div class="stagger-item">
         <div class="stagger-img-wrap">
-          <div class="stagger-img-placeholder">🖥️</div>
+          <img src="assets/project-crm.jpg" alt="SouthBridge CRM 界面" class="stagger-img" loading="lazy" />
         </div>
         <div class="stagger-content">
           <div class="stagger-num font-mono">01 · AI Consulting CRM</div>
@@ -311,7 +552,7 @@
 
       <div class="stagger-item">
         <div class="stagger-img-wrap">
-          <div class="stagger-img-placeholder">🤖</div>
+          <img src="assets/project-ai-interview.jpg" alt="AI 模拟面试平台界面" class="stagger-img" loading="lazy" />
         </div>
         <div class="stagger-content">
           <div class="stagger-num font-mono">02 · AI Interview Platform</div>
@@ -323,7 +564,7 @@
 
       <div class="stagger-item">
         <div class="stagger-img-wrap">
-          <img src="assets/project-progress-notebook.jpg" alt="SouthBridge 课堂笔记 - 活页笔记本设计" class="stagger-img" loading="lazy" />
+          <img src="assets/project-progress.jpg" alt="学生进度管理平台界面" class="stagger-img" loading="lazy" />
         </div>
         <div class="stagger-content">
           <div class="stagger-num font-mono">03 · Student Progress</div>
@@ -335,7 +576,7 @@
 
       <div class="stagger-item">
         <div class="stagger-img-wrap">
-          <div class="stagger-img-placeholder">🏫</div>
+          <img src="assets/project-teacher.jpg" alt="教师标准化管理体系界面" class="stagger-img" loading="lazy" />
         </div>
         <div class="stagger-content">
           <div class="stagger-num font-mono">04 · Teacher Standardization</div>
@@ -345,30 +586,60 @@
         </div>
       </div>
 
-      <div class="stagger-item">
-        <div class="stagger-img-wrap">
-          <div class="stagger-img-placeholder">🎓</div>
-        </div>
-        <div class="stagger-content">
-          <div class="stagger-num font-mono">05 · Mentorship Website</div>
-          <h3 class="stagger-title">过来人 Mentor · 品牌官网</h3>
-          <p class="stagger-desc">已上线的朋辈 mentorship 官网。点进去逛：首页、About、导师列表、导师主页、成为导师——每个 tab 都讲清平台是干嘛的。</p>
-          <a href="project-mentorship-website.html" class="stagger-link">查看项目介绍 →</a>
-        </div>
-      </div>
+    </div>
+  </div>
+</section>
 
-      <div class="stagger-item">
-        <div class="stagger-img-wrap">
-          <div class="stagger-img-placeholder">💃</div>
-        </div>
-        <div class="stagger-content">
-          <div class="stagger-num font-mono">06 · Creative Tool</div>
-          <h3 class="stagger-title">随机舞蹈练习工具</h3>
-          <p class="stagger-desc">Fisher-Yates 随机算法 + Web Audio API 倒计时音效。小而美的创意工具——因为跳舞是我坚持了 20 年的事。</p>
-          <a href="#" class="stagger-link">查看项目 →</a>
-        </div>
+<!-- ========== MENTORSHIP (Flagship) ========== -->
+<section class="section reveal-section" id="mentorship">
+  <div class="section-container">
+    <div class="section-header-with-blob reveal">
+      <div class="section-blob animate-blob-about"></div>
+      <span class="section-title-num font-mono">04</span>
+      <h2 class="section-title-text">Mentorship</h2>
+    </div>
+
+    <p class="section-subtitle reveal font-serif">Breaking Information Asymmetry</p>
+    <p class="mentorship-vision reveal font-serif">
+      不做中介，做「过来人」——打破留学信息差，做中国最大的朋辈 <em>Mentorship</em> 平台，然后走向国际。
+    </p>
+
+    <!-- 数据条 -->
+    <div class="mentorship-stats reveal">
+      <div class="mentorship-stat"><span class="mentorship-stat-val">6</span><span class="mentorship-stat-label">申请赛道</span></div>
+      <div class="mentorship-stat"><span class="mentorship-stat-val">15+</span><span class="mentorship-stat-label">名校导师</span></div>
+      <div class="mentorship-stat"><span class="mentorship-stat-val">7</span><span class="mentorship-stat-label">能力域</span></div>
+      <div class="mentorship-stat"><span class="mentorship-stat-val">23</span><span class="mentorship-stat-label">精准标签</span></div>
+    </div>
+
+    <!-- 四大支柱 -->
+    <div class="mentorship-grid reveal">
+      <div class="mentorship-card">
+        <div class="mentorship-card-icon">🎓</div>
+        <div class="mentorship-card-title">朋辈导师网络</div>
+        <p class="mentorship-card-desc">导师来自哈佛 / 斯坦福 / MIT / 牛津 / 剑桥 / 耶鲁，覆盖 6 条赛道，Ambassador 模式快速扩张。</p>
+      </div>
+      <div class="mentorship-card">
+        <div class="mentorship-card-icon">🏷️</div>
+        <div class="mentorship-card-title">四维精准匹配</div>
+        <p class="mentorship-card-desc">赛道 × 能力两维交叉筛选，7 大能力域 23 个标签，找到背景最契合、结果又好的那一位。</p>
+      </div>
+      <div class="mentorship-card">
+        <div class="mentorship-card-icon">🤖</div>
+        <div class="mentorship-card-title">AI 全流程自动化</div>
+        <p class="mentorship-card-desc">Coffee chat → 飞书建会 → 逐字稿 → AI 生成 profile，从 outreach 到上线全自动化。</p>
+      </div>
+      <div class="mentorship-card">
+        <div class="mentorship-card-icon">🚫</div>
+        <div class="mentorship-card-title">不做中介 · To B 扩张</div>
+        <p class="mentorship-card-desc">按「真的帮到你的时间」计费；学生端半公益，机构端打包出售，双向验证 Market Traction。</p>
       </div>
     </div>
+
+    <a href="project-mentorship-website.html" class="mentorship-cta reveal">
+      进入官网
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
   </div>
 </section>
 
@@ -377,7 +648,7 @@
   <div class="section-container">
     <div class="section-header-with-blob reveal">
       <div class="section-blob animate-blob-experience"></div>
-      <span class="section-title-num font-mono">04</span>
+      <span class="section-title-num font-mono">05</span>
       <h2 class="section-title-text">Skills</h2>
     </div>
 
@@ -446,15 +717,15 @@
 <section class="section reveal-section" id="xhs">
   <div class="section-container" style="max-width:960px;">
 
-    <!-- Two-column layout -->
+    <!-- Header + story (two-column) -->
     <div class="xhs-layout reveal">
-      <!-- Left: profile -->
-      <div class="xhs-left">
+      <div class="xhs-head">
         <div class="section-header-with-blob" style="margin-bottom:8px;">
-          <span class="section-title-num font-mono">05</span>
-          <h2 class="section-title-text">知识分享自媒体</h2>
+          <span class="section-title-num font-mono">06</span>
+          <h2 class="section-title-text">自媒体</h2>
         </div>
-        <p class="project-handle" style="margin:0 0 8px 0;">Jess Dong</p>
+        <p class="project-handle" style="margin:0 0 6px 0;">这董JessDong</p>
+        <p class="xhs-tagline">干货 / 知识分享 / 教学</p>
 
         <!-- Platform links -->
         <div class="social-strip" style="margin-bottom:16px;">
@@ -485,12 +756,35 @@
         </div>
       </div>
 
-      <!-- Right: post grid -->
-      <div class="xhs-right">
-        <div class="xhs-grid" id="xhsGrid">
-          <!-- Cards inserted by JS -->
-        </div>
+      <!-- Origin story -->
+      <div class="xhs-story">
+      <div class="xhs-story-label"><span>THE ORIGIN · 命运的齿轮</span></div>
+      <p class="xhs-story-lead">
+        拿到耶鲁硕士 offer 之后，我觉得自己的文书写得不错，就做了一条「文书写作」的干货分享视频。结果完全超出我的预料——发布 <em>10 小时</em>后，这条内容就冲到了小红书「文书」搜索关键词下<em>全站所有帖子的点赞第一名</em>。
+      </p>
+      <p>
+        深受鼓舞，我又做了英文面试的干货。可能是网上冲浪太多了，我就抱着「<em>我要做我自己都爱看的视频</em>」的目的，反响再次很好，进了 <em>Top 15</em> 点赞！后台一下子涌进来一大堆私信，很多同学来找我做辅导。
+      </p>
+      <p>
+        那时候我还在 LSE 交换。我花了一个月，一边交换一边接学生，什么类型的申请都接：博士申请、美本转学、海外实习面试、美本申请…… 一个月，我一个人把整条交付链路全部跑通——从做爆款引流、跟客户沟通谈价格、定制教学方案，再到完整落地交付。
+      </p>
+      <p>
+        而且反馈真的超乎预期，大家都拿到了 offer。有个同学甚至拿到<em>全省第一</em>，她说面试的时候面试官明显眼前一亮，笑着跟她聊了很久，她就知道稳了。
+      </p>
+      <p>
+        也是在这个过程里，我第一次发现自己身上很多以前没意识到的能力，原来我可以做到这么多事。
+      </p>
+      <p>
+        成功跑通后，我下一步的目标就是开公司 Scale Up，所以现在在做 <em>AI × 教育</em>。
+      </p>
       </div>
+    </div>
+
+    <blockquote class="xhs-story-quote reveal">回头看，这或许就是命运的齿轮转动的瞬间吧——整个创业的起点，就是一次简简单单的自媒体分享。</blockquote>
+
+    <!-- Post row (single line) -->
+    <div class="xhs-grid reveal" id="xhsGrid">
+      <!-- Cards inserted by JS -->
     </div>
 
     <a href="project-self-media.html" class="project-back reveal" style="margin-top:32px;display:inline-flex;">
@@ -505,52 +799,96 @@
 <section class="section reveal-section" id="photography">
   <div class="section-container">
     <div class="section-header-with-blob reveal">
-      <span class="section-title-num font-mono">06</span>
+      <span class="section-title-num font-mono">07</span>
       <h2 class="section-title-text">Photography</h2>
     </div>
     <p class="section-subtitle reveal font-serif">Studio Works · 摄影作品</p>
-    <p class="section-desc reveal">摄影工作室时期的作品——人像、主题写真、毕业照。点进任意项目，浏览完整作品集。</p>
+    <p class="section-desc reveal">摄影工作室时期的作品，分布在不同城市与主题。悬停感受胶片质感，点击任意一张进入相册。</p>
 
-    <!-- Overview: one card per project (1-4 preview photos) -->
-    <div class="photo-overview reveal" id="photoOverview"></div>
-
-    <!-- Detail: project sidebar + full spread -->
-    <div class="photo-detail" id="photoDetail" hidden>
-      <button type="button" class="photo-back" id="photoBack">← All Projects</button>
-      <div class="photo-layout">
-        <aside class="photo-sidebar">
-          <span class="photo-sidebar-label">Projects · 摄影项目</span>
-        </aside>
-        <div class="photo-stage"></div>
+    <div class="film-contact reveal">
+      <div class="film-contact-bar">
+        <span>JESS · FILM LOG 2026</span>
+        <span>ROLL 08 — SELECTS</span>
       </div>
+      <div class="film-contact-grid" id="filmContactGrid"></div>
     </div>
   </div>
 </section>
 
+<!-- ========== JOURNEY (全球足迹 · Global Footprint) ========== -->
+<section class="section journey-section" id="journey">
+  <div class="journey-wrap">
+    <div id="journeyGlobe"></div>
+    <div class="journey-content">
+      <div class="journey-head">
+        <span class="section-title-num font-mono">08</span>
+        <h2 class="section-title-text">全球足迹</h2>
+      </div>
+      <p class="journey-sub">Global Journey · Places I've Been</p>
+      <ul class="journey-list" id="journeyList"></ul>
+    </div>
+    <span class="journey-hint">Hover a place · Click to open the journal</span>
+    <div class="journey-card" id="journeyCard">
+      <span class="title" id="journeyCardTitle"></span>
+      <div class="date" id="journeyCardDate"></div>
+      <div class="marquee"><div class="marquee-track" id="journeyCardMarquee"></div></div>
+      <div class="enter">Click to enter &rarr;</div>
+    </div>
+  </div>
+</section>
+
+<!-- 详情视图（Journal，全屏覆盖） -->
+<div id="journeyDetail">
+  <section class="journey-detail-layout">
+    <nav class="journey-detail-nav">
+      <h1 class="journey-detail-logo">
+        <a href="#" id="journeyBack" title="Back to globe">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.25" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+        </a>
+      </h1>
+      <ul class="journey-detail-list" id="journeyDetailList"></ul>
+      <ul class="journey-detail-meta">
+        <li><a href="#">About</a></li>
+        <li class="hide-mobile"><a href="#">Socials</a></li>
+      </ul>
+    </nav>
+    <div class="journey-detail-journal">
+      <div class="journey-journal-card">
+        <div class="journey-journal-pin">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"/></svg>
+        </div>
+        <div class="journey-journal-head">
+          <h1 id="journeyJournalTitle"></h1>
+          <div class="journey-journal-badge"><span id="journeyJournalDate"></span></div>
+        </div>
+      </div>
+      <div class="journey-masonry" id="journeyMasonry"></div>
+      <a href="#" class="journey-totop" id="journeyToTop">Go to top &uarr;</a>
+    </div>
+  </section>
+</div>
+
 <!-- ========== LIFE (Photography + Dance) ========== -->
+<!-- TEMPORARILY DISABLED — uncomment to restore (Life 日记本 / visual diary)
 <section class="section reveal-section section-dark" id="visuals">
   <div class="section-container">
     <div class="section-header-with-blob reveal">
-      <span class="section-title-num font-mono">07</span>
+      <span class="section-title-num font-mono">09</span>
       <h2 class="section-title-text">Life</h2>
     </div>
 
     <p class="section-subtitle reveal font-serif">Photography · Dance · The Other Half of Me</p>
 
-    <!-- Quote -->
     <div class="visual-quote reveal">
       <p class="visual-quote-text font-serif">"The camera is an instrument that teaches people how to see without a camera."</p>
       <p class="visual-quote-author font-mono">— Dorothea Lange</p>
     </div>
 
-    <!-- Dance mention -->
     <p class="visual-collection-label reveal font-mono" style="margin-bottom:24px;">20 years of dancing · 90K+ followers · 3.7M+ views</p>
 
-    <!-- Photo Gallery Flip Book -->
     <div class="flip-container reveal" id="photoFlipContainer">
       <div class="flip-bw" id="photoFlipBw">
         <div class="flip-book" id="photoFlipBook">
-          <!-- Photo pages inserted by JS -->
         </div>
         <button class="flip-nav" id="photoFlipPrev" style="left: -23px;" aria-label="Previous page">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M15 4L7 12L15 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -568,12 +906,46 @@
     <p class="visual-collection-label reveal font-mono">2026 Collection · Selected Works</p>
   </div>
 </section>
+-->
+
+<!-- ========== K-POP DANCER ========== -->
+<section class="section reveal-section kpop-home" id="kpop">
+  <div class="section-container">
+    <div class="section-header-with-blob reveal">
+      <span class="section-title-num font-mono">10</span>
+      <h2 class="section-title-text">K-Pop Dancer</h2>
+    </div>
+
+    <p class="kpop-home-intro reveal">
+      少女时代《Gee》火起来那年，我对着镜子自己学起了 K-pop——这一跳就是 15 年。跳舞是我表达自我的方式。
+    </p>
+
+    <a class="kpop-home-feature reveal" href="https://youtu.be/rUCqbrDQY9E" target="_blank">
+      <img src="assets/kpop-06.jpg" alt="IZ*ONE — La Vie en Rose" loading="lazy" />
+      <span class="kpop-home-play">
+        <svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+      </span>
+      <span class="kpop-home-meta">IZ*ONE — La Vie en Rose · 4:32</span>
+    </a>
+
+    <div class="kpop-home-photos reveal">
+      <img src="assets/roadshow-01.jpg" alt="路演幕后" loading="lazy" />
+      <img src="assets/roadshow-02.jpg" alt="路演幕后" loading="lazy" />
+      <img src="assets/roadshow-03.jpg" alt="路演幕后" loading="lazy" />
+    </div>
+
+    <a href="project-kpop-dancer.html" class="kpop-home-link reveal">
+      查看全部舞蹈
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+</section>
 
 <!-- ========== CONTACT ========== -->
 <section class="section reveal-section" id="contact">
   <div class="section-container">
     <div class="section-header-with-blob reveal">
-      <span class="section-title-num font-mono">08</span>
+      <span class="section-title-num font-mono">11</span>
       <h2 class="section-title-text">Get in Touch</h2>
     </div>
 
@@ -582,28 +954,14 @@
         <p class="contact-intro font-serif">Let's build something together.</p>
         <p class="contact-desc">Whether it's about AI, product, photography, or just a good conversation — I'm always open to connect.</p>
         <div class="contact-links">
-          <a href="mailto:dongyixuan1130@gmail.com" class="contact-link">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7L12 14L22 7"/></svg>
-            <span>Email</span>
-          </a>
-          <a href="https://github.com/JessieDong-HK" target="_blank" class="contact-link">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-            <span>GitHub</span>
-          </a>
+          <span class="contact-link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <span>微信 · d20001130</span>
+          </span>
           <a href="https://xhslink.com/m/2T9rksoQ0l0" target="_blank" class="contact-link">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="M8 12h8M12 8l4 4-4 4"/></svg>
             <span>Rednote</span>
           </a>
-        </div>
-      </div>
-      <div class="contact-stats">
-        <div class="contact-stat">
-          <span class="contact-stat-val">2.5k</span>
-          <span class="contact-stat-label">Followers</span>
-        </div>
-        <div class="contact-stat">
-          <span class="contact-stat-val">8.6k</span>
-          <span class="contact-stat-label">Likes</span>
         </div>
       </div>
     </div>
@@ -624,124 +982,343 @@
 
 <script src="js/main.js"></script>
 
-<!-- Photography: lightGallery (local) -->
-<script src="vendor/lightgallery.min.js"></script>
-<script src="vendor/lg-thumbnail.min.js"></script>
-<script src="vendor/lg-zoom.min.js"></script>
+<!-- Photography: 3D globe (local) -->
+<script src="vendor/three.min.js"></script>
+<script src="vendor/globe.gl.min.js"></script>
+<script src="assets/land-110m.js"></script>
 <script>
 (function () {
-  var root = document.getElementById('photography');
-  if (!root) return;
+  var ALBUMS = {
+    ary:       { title: 'Ary NUS Graduation',    city: '新加坡' },
+    dawn:      { title: 'Dawn',                  city: '秦皇岛' },
+    ditto:     { title: 'Ditto',                 city: '新加坡' },
+    facial:    { title: 'Facial Painting Event', city: '新加坡' },
+    fairy:     { title: 'Fairy',                 city: '大理' },
+    lili:      { title: 'Lili',                  city: '大理' },
+    ninja:     { title: 'Ninja',                 city: '新加坡' },
+    sunday:    { title: 'Sunday Evening',        city: '新加坡' },
+    wei:       { title: 'Wei UCSB Graduation',   city: '美国加州' }
+  };
 
-  function seq(id, n) {
-    return Array.from({ length: n }, function (_, i) { return id + '-' + String(i + 1).padStart(2, '0') + '.jpg'; });
-  }
-  var ALBUMS = [
-    { id: 'ary',       title: 'Ary NUS Graduation',    count: 36 },
-    { id: 'dawn',      title: 'Dawn',                  count: 6 },
-    { id: 'ditto',     title: 'Ditto',                 count: 11 },
-    { id: 'facial',    title: 'Facial Painting Event', count: 21 },
-    { id: 'fairy',     title: 'Fairy',                 count: 4 },
-    { id: 'lightrose', title: 'Light Rose',            count: 2 },
-    { id: 'lili',      title: 'Lili',                  count: 4 },
-    { id: 'ninja',     title: 'Ninja',                 count: 6 },
-    { id: 'sunday',    title: 'Sunday Evening',        count: 10 },
-    { id: 'wei',       title: 'Wei UCSB Graduation',   count: 7 }
-  ].map(function (a) {
-    var files = seq(a.id, a.count);
-    return {
-      id: a.id, title: a.title, count: a.count, files: files,
-      full: function (f) { return 'assets/photography/' + a.id + '/' + f; },
-      thumb: function (f) { return 'assets/photography/thumbs/' + f; }
-    };
+  var SELECTS = [
+    { album: 'sunday',    file: 'sunday-01.jpg' },
+    { album: 'ary',       file: 'ary-11.jpg' },
+    { album: 'dawn',      file: 'dawn-01.jpg' },
+    { album: 'fairy',     file: 'fairy-01.jpg' },
+    { album: 'ditto',     file: 'ditto-01.jpg' },
+    { album: 'ninja',     file: 'ninja-01.jpg' },
+    { album: 'wei',       file: 'wei-01.jpg' },
+    { album: 'lili',      file: 'lili-01.jpg' },
+    { album: 'dawn',      file: 'dawn-07.jpg' },
+    { album: 'facial',    file: 'facial-01.jpg' },
+    { album: 'ary',       file: 'ary-09.jpg' },
+    { album: 'sunday',    file: 'sunday-02.jpg' }
+  ];
+
+  var grid = document.getElementById('filmContactGrid');
+  if (!grid) return;
+
+  var html = '';
+  SELECTS.forEach(function (s, i) {
+    var a = ALBUMS[s.album];
+    var no = String(i + 1).padStart(2, '0');
+    html +=
+      '<a class="fcell" href="photography.html?album=' + s.album + '" data-album="' + s.album + '">' +
+        '<span class="finner">' +
+          '<span class="fframe">' +
+            '<img class="fimg" loading="lazy" src="assets/photography/' + s.album + '/' + s.file + '" alt="' + a.title + '">' +
+            '<span class="grain"></span><span class="vignette"></span><span class="leak"></span><span class="glare"></span>' +
+            '<span class="fno">' + no + '</span>' +
+            '<span class="flabel">' + a.title + ' · ' + a.city + '</span>' +
+          '</span>' +
+        '</span>' +
+      '</a>';
   });
+  grid.innerHTML = html;
 
-  var overview = document.getElementById('photoOverview');
-  var detail = document.getElementById('photoDetail');
-  var backBtn = document.getElementById('photoBack');
-  var sidebar = detail.querySelector('.photo-sidebar');
-  var stage = detail.querySelector('.photo-stage');
-  if (!overview || !detail || !backBtn || !sidebar || !stage) return;
-
-  // Build overview cards (1-4 preview photos each)
-  ALBUMS.forEach(function (a) {
-    var shown = a.files.slice(0, 4);
-    var card = document.createElement('button');
-    card.type = 'button';
-    card.className = 'photo-preview-card';
-    card.dataset.album = a.id;
-    var imgs = shown.map(function (f) {
-      return '<img src="' + a.thumb(f) + '" alt="' + a.title + '" loading="lazy" />';
-    }).join('');
-    card.innerHTML =
-      '<span class="preview-thumbs n' + shown.length + '">' + imgs + '</span>' +
-      '<span class="preview-meta"><span class="preview-title">' + a.title + '</span>' +
-      '<span class="preview-count">' + a.count + ' photos</span></span>';
-    overview.appendChild(card);
+  Array.prototype.forEach.call(grid.querySelectorAll('.fcell'), function (cell) {
+    var inner = cell.querySelector('.finner');
+    cell.addEventListener('mousemove', function (e) {
+      var r = cell.getBoundingClientRect();
+      var px = (e.clientX - r.left) / r.width;
+      var py = (e.clientY - r.top) / r.height;
+      cell.style.setProperty('--mx', (px * 100).toFixed(2) + '%');
+      cell.style.setProperty('--my', (py * 100).toFixed(2) + '%');
+      var rx = (0.5 - py) * 10;
+      var ry = (px - 0.5) * 12;
+      inner.style.transform = 'perspective(700px) rotateX(' + rx.toFixed(2) + 'deg) rotateY(' + ry.toFixed(2) + 'deg) scale3d(1.045,1.045,1.045)';
+    });
+    cell.addEventListener('mouseleave', function () {
+      inner.style.transform = '';
+      cell.style.setProperty('--mx', '50%');
+      cell.style.setProperty('--my', '50%');
+    });
   });
+})();
+</script>
 
-  // Build sidebar buttons + spread grid for each album (detail view)
-  ALBUMS.forEach(function (a, ai) {
-    var btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'photo-project' + (ai === 0 ? ' active' : '');
-    btn.dataset.album = a.id;
-    btn.innerHTML = '<span>' + a.title + '</span><em>' + a.count + '</em>';
-    sidebar.appendChild(btn);
+<!-- JOURNEY: 全球足迹 globe (agarun-style wireframe) + journal detail -->
+<script>
+(function () {
+  var root = document.getElementById('journeyGlobe');
+  if (!root || typeof Globe === 'undefined' || typeof THREE === 'undefined' || typeof WORLD_LAND === 'undefined') return;
 
-    var grid = document.createElement('div');
-    grid.className = 'photo-grid' + (ai === 0 ? ' active' : '');
-    grid.dataset.album = a.id;
-    var inner = document.createElement('div');
-    inner.className = 'photo-grid-inner';
-    inner.innerHTML = a.files.map(function (f) {
-      return '<a class="photo-item" href="' + a.full(f) + '">'
-        + '<img src="' + a.thumb(f) + '" alt="' + a.title + '" loading="lazy" />'
-        + '</a>';
-    }).join('');
-    grid.appendChild(inner);
-    stage.appendChild(grid);
+  // ---- 旅程地点（2026 年 2 月 · 西葡之旅） ----
+  var PLACES = [
+    { slug: 'madrid',  title: 'Madrid',       date: 'Feb 2026', lat: 40.4168, lng: -3.7038,  count: 17 },
+    { slug: 'lisbon',  title: 'Lisbon',       date: 'Feb 2026', lat: 38.7223, lng: -9.1393,  count: 23 },
+    { slug: 'roca',    title: 'Cabo da Roca', date: 'Feb 2026', lat: 38.7804, lng: -9.4989,  count: 13 },
+    { slug: 'seville', title: 'Seville',      date: 'Feb 2026', lat: 37.3891, lng: -5.9845,  count: 13 }
+  ];
 
-    // lightbox per album — click any photo to browse that album only
-    if (window.lightGallery) {
-      lightGallery(grid, {
-        selector: '.photo-item',
-        plugins: [window.lgThumbnail, window.lgZoom],
-        download: false, counter: true, thumbnail: true, zoom: true
+  PLACES.forEach(function (p) {
+    p.photos = [];
+    for (var i = 1; i <= p.count; i++) {
+      var f = p.slug + '-' + String(i).padStart(2, '0') + '.jpg';
+      p.photos.push({
+        id: p.slug, file: f,
+        thumb: 'assets/travel/thumbs/' + f,
+        full: 'assets/travel/' + p.slug + '/' + f
       });
     }
   });
 
-  function activateAlbum(id) {
-    sidebar.querySelectorAll('.photo-project').forEach(function (b) {
-      b.classList.toggle('active', b.dataset.album === id);
-    });
-    stage.querySelectorAll('.photo-grid').forEach(function (g) {
-      g.classList.toggle('active', g.dataset.album === id);
-    });
+  var isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+  function rand(a, b) { return Math.random() * (b - a) + a; }
+
+  // ---- 点：每个地点一个红点 ----
+  var pointsData = PLACES.map(function (p) { return { lat: p.lat, lng: p.lng, radius: 0.19, place: p }; });
+
+  // ---- 弧线：地点两两相连 ----
+  var arcsData = [];
+  for (var i = 0; i < PLACES.length; i++) {
+    for (var j = i + 1; j < PLACES.length; j++) {
+      arcsData.push({
+        startLat: PLACES[i].lat, startLng: PLACES[i].lng,
+        endLat: PLACES[j].lat,   endLng: PLACES[j].lng,
+        color: ['red', 'red']
+      });
+    }
   }
 
-  // Sidebar switching (within detail view)
-  sidebar.addEventListener('click', function (e) {
-    var btn = e.target.closest('.photo-project');
-    if (btn) activateAlbum(btn.dataset.album);
+  // ---- 环绕粒子 ----
+  var particles = [];
+  for (var k = 0; k < 500; k++) {
+    particles.push({ lat: (Math.random() - 0.5) * 180, lng: (Math.random() - 0.5) * 360, alt: 1.4 * Math.random() + 0.1 });
+  }
+
+  var globe = Globe({ rendererConfig: { antialias: true }, animateIn: false })(root)
+    .width(root.clientWidth)
+    .height(root.clientHeight)
+    .backgroundColor('rgba(0,0,0,0)')
+    .atmosphereColor('#ffffff')
+    .showGlobe(false)
+    .showAtmosphere(false)
+    .showGraticules(false)
+    .polygonsData(WORLD_LAND.features)
+    .polygonCapColor(function () { return 'rgba(255,255,255,0.77)'; })
+    .polygonSideColor(function () { return 'rgba(255,255,255,0)'; })
+    .polygonStrokeColor(function () { return isMac ? '#000000' : 'darkslategray'; })
+    .polygonAltitude(function () { return 0; })
+    .polygonsTransitionDuration(0)
+    .pointsData(pointsData)
+    .pointColor(function () { return 'rgba(255,0,0,0.75)'; })
+    .pointAltitude(0.002)
+    .pointRadius(function (d) { return d.radius; })
+    .pointsMerge(true)
+    .ringsData([])
+    .ringColor(function () { return ringColor; })
+    .ringMaxRadius('maxR')
+    .ringPropagationSpeed('propagationSpeed')
+    .ringRepeatPeriod('repeatPeriod')
+    .arcsData(arcsData)
+    .arcColor('color')
+    .arcDashLength(function () { return rand(0.06, 0.7); })
+    .arcDashGap(function () { return 10 * rand(0.025, 0.4); })
+    .arcDashAnimateTime(function () { return 20000 * rand(0.08, 0.8) + 500; })
+    .customLayerData(particles)
+    .customThreeObject(function () {
+      return new THREE.Mesh(
+        new THREE.SphereGeometry(0.22),
+        new THREE.MeshBasicMaterial({ color: '#777777', transparent: true, opacity: 0.25 })
+      );
+    })
+    .customThreeObjectUpdate(function (obj, d) {
+      obj.position.copy(globe.getCoords(d.lat, d.lng, d.alt));
+    });
+
+  window.journeyGlobe = globe;
+
+  function ringColor(t) { return 'rgba(255,100,50,' + Math.sqrt(1 - t) + ')'; }
+
+  globe.onGlobeReady(function () {
+    var R = globe.getGlobeRadius();
+    var wire = new THREE.LineSegments(
+      new THREE.WireframeGeometry(new THREE.SphereGeometry(R, 60, 24)),
+      new THREE.LineBasicMaterial({ color: 'lightgrey', transparent: true, opacity: 0.35 })
+    );
+    globe.scene().add(wire);
+    var glass = new THREE.Mesh(
+      new THREE.SphereGeometry(R - 0.5, 64, 32),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.18 })
+    );
+    glass.renderOrder = Number.MAX_SAFE_INTEGER;
+    globe.scene().add(glass);
   });
 
-  // Overview card -> open detail at that album
-  overview.addEventListener('click', function (e) {
-    var card = e.target.closest('.photo-preview-card');
-    if (!card) return;
-    activateAlbum(card.dataset.album);
-    overview.hidden = true;
-    detail.hidden = false;
-    detail.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  // ---- 地球视图：列表 hover 飞行 + 点击进入详情 ----
+  var listEl = document.getElementById('journeyList');
+  PLACES.forEach(function (p) {
+    var li = document.createElement('li');
+    li.textContent = p.title;
+    li.addEventListener('mouseenter', function () { enter(p); });
+    li.addEventListener('mouseleave', function () { leave(); });
+    li.addEventListener('click', function () { openPlace(p); });
+    listEl.appendChild(li);
   });
 
-  // Back -> overview
-  backBtn.addEventListener('click', function () {
-    detail.hidden = true;
-    overview.hidden = false;
-    overview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  var card = document.getElementById('journeyCard');
+  var cardTitle = document.getElementById('journeyCardTitle');
+  var cardDate = document.getElementById('journeyCardDate');
+  var cardMarquee = document.getElementById('journeyCardMarquee');
+
+  function enter(p) {
+    clearTimeout(leaveTimer);
+    globe.pointOfView({ lat: p.lat, lng: p.lng, altitude: 1 }, 1000);
+    forced = true;
+    controls.autoRotateSpeed = 0.69;
+    globe.ringsData([{ lat: p.lat, lng: p.lng, maxR: 9, propagationSpeed: 0.88, repeatPeriod: 1777 }]);
+    cardTitle.textContent = p.title;
+    cardDate.textContent = p.date;
+    var html = '';
+    for (var n = 0; n < 2; n++) html += '<span>' + p.title + ' · ' + p.photos.length + ' photos</span>';
+    cardMarquee.innerHTML = html;
+    card.style.left = 'calc(33% + ' + rand(10, 80).toFixed(0) + 'px)';
+    card.style.top = 'calc(33% + ' + rand(10, 50).toFixed(0) + 'px)';
+    card.classList.add('show');
+  }
+
+  var leaveTimer;
+  function leave() {
+    clearTimeout(leaveTimer);
+    leaveTimer = setTimeout(function () {
+      globe.pointOfView({ lat: 30, altitude: 2 }, 1000);
+      forced = false;
+      controls.autoRotateSpeed = 1.5;
+      globe.ringsData([]);
+      card.classList.remove('show');
+    }, 120);
+  }
+
+  // ---- 自转 ----
+  var controls = globe.controls();
+  controls.enabled = false;
+  controls.enableZoom = false;
+  controls.autoRotate = true;
+  controls.autoRotateSpeed = 1.5;
+  var forced = false;
+  globe.pointOfView({ lat: 30, lng: -30, altitude: 2 }, 0);
+
+  (function tick() {
+    if (!forced) controls.autoRotateSpeed = 1.5;
+    controls.update();
+    requestAnimationFrame(tick);
+  })();
+
+  window.addEventListener('resize', function () {
+    globe.width(root.clientWidth).height(root.clientHeight);
+  });
+
+  // ---- 详情视图（Journal） ----
+  var detailView = document.getElementById('journeyDetail');
+  var detailList = document.getElementById('journeyDetailList');
+  var journalTitle = document.getElementById('journeyJournalTitle');
+  var journalDate = document.getElementById('journeyJournalDate');
+  var journalMasonry = document.getElementById('journeyMasonry');
+  var backHome = document.getElementById('journeyBack');
+  var toTop = document.getElementById('journeyToTop');
+  var currentPlace = null;
+
+  // 左侧详情列表（与地球列表一致，可跳转其它地点）
+  PLACES.forEach(function (p) {
+    var li = document.createElement('li');
+    var a = document.createElement('a');
+    a.href = '#';
+    a.textContent = p.title;
+    a.dataset.slug = p.slug;
+    a.addEventListener('click', function (e) { e.preventDefault(); openPlace(p); });
+    li.appendChild(a);
+    detailList.appendChild(li);
+  });
+
+  function openPlace(p) {
+    currentPlace = p;
+    journalTitle.textContent = p.title;
+    journalDate.textContent = p.date;
+    journalMasonry.innerHTML = p.photos.map(function (ph, i) {
+      return '<figure><img src="' + ph.thumb + '" loading="lazy" data-idx="' + i + '" alt="' + p.title + ' photo ' + (i + 1) + '"></figure>';
+    }).join('');
+    Array.prototype.forEach.call(detailList.querySelectorAll('a'), function (a) {
+      a.classList.toggle('current', a.dataset.slug === p.slug);
+    });
+    detailView.classList.add('open');
+    detailView.scrollTop = 0;
+  }
+
+  function closePlace() {
+    detailView.classList.remove('open');
+  }
+  backHome.addEventListener('click', function (e) { e.preventDefault(); closePlace(); });
+  toTop.addEventListener('click', function (e) { e.preventDefault(); detailView.scrollTo({ top: 0, behavior: 'smooth' }); });
+
+  // ---- 灯箱 ----
+  var lb = document.createElement('div');
+  lb.className = 'photo-lb';
+  lb.innerHTML =
+    '<button class="photo-lb-close" aria-label="Close">&times;</button>' +
+    '<button class="photo-lb-nav photo-lb-prev" aria-label="Prev">&#10094;</button>' +
+    '<button class="photo-lb-nav photo-lb-next" aria-label="Next">&#10095;</button>' +
+    '<img src="" alt="">' +
+    '<div class="photo-lb-caption"></div>' +
+    '<div class="photo-lb-count"></div>';
+  document.body.appendChild(lb);
+
+  var lbImg = lb.querySelector('img');
+  var lbCaption = lb.querySelector('.photo-lb-caption');
+  var lbCount = lb.querySelector('.photo-lb-count');
+  var lbPhotos = [], lbTitle = '', lbIndex = 0;
+
+  function showLightbox(i) {
+    lbIndex = (i + lbPhotos.length) % lbPhotos.length;
+    lbImg.src = lbPhotos[lbIndex].full;
+    lbCaption.textContent = lbTitle;
+    lbCount.textContent = (lbIndex + 1) + ' / ' + lbPhotos.length;
+  }
+  function openLightbox(photos, title, index) {
+    lbPhotos = photos; lbTitle = title;
+    showLightbox(index);
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  lb.querySelector('.photo-lb-close').addEventListener('click', closeLightbox);
+  lb.querySelector('.photo-lb-prev').addEventListener('click', function () { showLightbox(lbIndex - 1); });
+  lb.querySelector('.photo-lb-next').addEventListener('click', function () { showLightbox(lbIndex + 1); });
+  lb.addEventListener('click', function (e) { if (e.target === lb) closeLightbox(); });
+  document.addEventListener('keydown', function (e) {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') showLightbox(lbIndex - 1);
+    else if (e.key === 'ArrowRight') showLightbox(lbIndex + 1);
+  });
+
+  journalMasonry.addEventListener('click', function (e) {
+    var img = e.target.closest('img');
+    if (!img || !currentPlace) return;
+    openLightbox(currentPlace.photos, currentPlace.title, parseInt(img.dataset.idx, 10));
   });
 })();
 </script>

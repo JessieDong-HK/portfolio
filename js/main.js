@@ -29,29 +29,29 @@ const EXPERIENCES = [
   {
     year: 2023,
     era: 'ERA 02',
-    title: 'Group1001',
-    subtitle: 'Actuarial Analyst Intern',
-    description: 'Validated 10,000+ historical records for actuarial system migration with 100% accuracy. Built Excel VBA automation tools, reducing monthly reporting time by 30%. Learned how data drives decisions at scale.',
+    title: '在 Indiana U.S. 工作',
+    subtitle: 'Actuarial Analyst · Insurance 精算师',
+    description: '也就是那个时候，我发现被奉为高薪"香饽饽"的工作，并不是我的追求。',
     location: 'Indiana, USA',
     image: 'assets/exp-indiana.jpg',
   },
   {
     year: 2024,
     era: 'ERA 03',
-    title: 'Hytech Technology',
-    subtitle: 'HR Data Analyst Intern',
-    description: 'Automated global payroll reporting with Excel VBA, cutting processing time from 2 days to 1 hour. Built real-time recruitment dashboard tracking 10+ KPIs across international offices.',
+    title: '在新加坡工作',
+    subtitle: 'Data Analyst',
+    description: '在新加坡做 Data Analyst。我探索各式各样的事情：K-pop 舞蹈路演，当摄影师，摆摊。有人说：你做这些有什么用？不是浪费时间吗？恰恰相反，这些事情让我脱离学校，接触到了真实的世界，让我有空间发挥执行力&amp;创作力，这带给我的成长比我过去20年在学校获得的要更大。从那之后，我才开始坚信：我不管做什么都会成功的，再也不会自我怀疑，从而拥有了被朋友们称为“恐怖”的执行力 hhh',
     location: 'Singapore',
-    image: 'assets/exp-xhs.jpg',
+    image: 'assets/exp-singapore-work.jpg',
   },
   {
     year: 2024,
     era: 'ERA 04',
-    title: 'Dance in Singapore',
-    subtitle: 'Dancer · 20 Years and Counting',
-    description: 'Dance is my longest-running discipline. A glimpse from Singapore — the practice that keeps me grounded while I build at full speed.',
-    location: 'Singapore',
-    image: 'assets/exp-singapore-dance.jpg',
+    title: '成为持证潜水员',
+    subtitle: 'PADI 持证潜水员',
+    description: '已打卡潜点：涛岛 Ko Tao &amp; 斯米兰群岛 Similan。特别刺激的是，我考证时，刚从游泳池毕业，第一次下海，就遇到了我导师都没遇到过的超罕见剧毒箱型水母！那时候我还不太会在海里控制身体，它就从我身旁半米游过！',
+    location: 'Thailand',
+    image: 'assets/exp-diving.jpg',
   },
   {
     year: 2025,
@@ -72,13 +72,22 @@ const EXPERIENCES = [
     image: 'assets/exp-lse.jpg',
   },
   {
-    year: 2026,
+    year: 2025,
     era: 'ERA 07',
-    title: 'SouthBridge · AI Founder',
-    subtitle: 'Building AI-Native Education Products',
-    description: 'Founded an AI-driven education consultancy. Built CRM, interview platform, and progress tracking system from scratch — all deployed, all running real business. Top 30 in HKUST Entrepreneurship Competition.',
+    title: '知识口播自媒体 · 这董JessDong',
+    subtitle: '小红书 · 抖音 · 留学干货',
+    description: '拿到耶鲁硕士 offer 后，我把写文书的经验做成干货视频——发布 10 小时就冲上小红书「文书」关键词全站点赞第一，英文面试干货也进了 Top 15。1.3 万粉丝、96.3K 赞与收藏。在 LSE 交换的一个月里，我一个人跑通了从爆款引流、谈价格、定制方案到交付的整条链路，有学生甚至拿到了全省第一。',
+    location: 'Online',
+    image: 'assets/grid-wenshu.jpg',
+  },
+  {
+    year: 2026,
+    era: 'ERA 08',
+    title: 'Southbridge Consulting CEO',
+    subtitle: 'AI + 教育 · AI + 生物医药',
+    description: '一边读港科大与耶鲁大学双学位管理学硕士，一边做自己的创业公司，主要聚焦 AI + 教育 和 AI + 生物医药 两大方向',
     location: 'Hong Kong',
-    image: 'assets/exp-lanzhou.jpg',
+    image: 'assets/exp-southbridge-ceo.jpg',
   },
 ];
 
@@ -156,13 +165,12 @@ const PHOTO_PAGES = [
 ];
 
 // XHS posts (representative works)
+// 数据字段：views 观看/播放 · likes 点赞 · comments 评论 · collects 收藏 —— 已替换为真实数据
 const XHS_POSTS = [
-  { title: '英文面试通过手段 Part1 · 附模板', image: 'assets/grid-mianshi.jpg', likes: '', link: 'http://xhslink.com/o/3XW7aZVif1R' },
-  { title: '马年逆袭！用1年完成3年的计划 · 实操版', image: 'assets/grid-nixi.jpg', likes: '', link: 'https://v.douyin.com/RIStfEeZF6c/' },
-  { title: '选学校最重要的是选城市 · HKUST 就读体验', image: 'assets/grid-hkust.jpg', likes: '', link: 'http://xhslink.com/o/1HpmNkY4ZlC' },
-  { title: '文书搜索关键词 · 全网最全整理', image: 'assets/grid-wenshu.jpg', likes: '', link: '#' },
-  { title: '上纽昆杜申请攻略 · 避坑指南', image: 'assets/post-hkust.jpg', likes: '', link: '#' },
-  { title: 'AI 工具推荐 · 留学生必备效率神器', image: 'assets/post-mianshi.jpg', likes: '', link: '#' },
+  { title: '百试不爽的英文面试通过手段 Part1 / 附模板', image: 'assets/grid-mianshi.jpg', platform: '小红书', views: '25万', likes: '1.9万', comments: '69', collects: '1.9万', link: 'http://xhslink.com/o/3XW7aZVif1R' },
+  { title: '美国藤校耶鲁 DIY 文书 / 申请经验分享', image: 'assets/grid-wenshu.jpg', platform: '小红书', views: '27万', likes: '2万', comments: '141', collects: '1.6万', link: 'http://xhslink.cn/o/1VAAjvooKjh' },
+  { title: '马年逆袭！用1年完成3年的计划｜摆烂人实操', image: 'assets/grid-nixi.jpg', platform: '抖音', views: '19万', likes: '8400', comments: '67', collects: '7500', link: 'https://v.douyin.com/RIStfEeZF6c/' },
+  { title: '都快毕业了，才明白选学校最重要的是选城市', image: 'assets/grid-hkust.jpg', platform: '小红书', views: '28万', likes: '1.3万', comments: '359', collects: '4800', link: 'http://xhslink.com/o/1HpmNkY4ZlC' },
 ];
 
 // ============ PRISMA HERO ANIMATION ============
@@ -272,7 +280,7 @@ const XHS_POSTS = [
 
   if (!fanStage) return;
 
-  let activeIndex = 2; // Default to middle (Hytech)
+  let activeIndex = 2; // Default to middle (新加坡工作)
   const N = EXPERIENCES.length;
 
   function cardPos(i) {
@@ -591,7 +599,27 @@ document.addEventListener('DOMContentLoaded', () => {
     grid.innerHTML = XHS_POSTS.map(post => `
       <a href="${post.link || 'project-self-media.html'}" class="xhs-grid-card" target="_blank">
         <img src="${post.image}" alt="${post.title}" class="xhs-grid-cover" loading="lazy" />
-        <div class="xhs-grid-label">${post.title}</div>
+        <div class="xhs-grid-label">
+          <div class="xhs-grid-title">${post.title}</div>
+          <div class="xhs-grid-meta">
+            <span class="xhs-meta" title="点赞">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <span>${post.likes}</span>
+            </span>
+            <span class="xhs-meta" title="评论">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+              <span>${post.comments}</span>
+            </span>
+            <span class="xhs-meta" title="收藏">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+              <span>${post.collects}</span>
+            </span>
+            <span class="xhs-meta" title="观看">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>${post.views}</span>
+            </span>
+          </div>
+        </div>
       </a>
     `).join('');
   }

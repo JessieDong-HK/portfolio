@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Photography · Jess Dong</title>
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500&family=Noto+Sans+SC:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css" />
+<style>
+  :root {
+    --paper: #faf9f7;
+    --ink: #1a1a1a;
+    --ink-dim: #6b6b6b;
+    --ink-faint: #9a9a9a;
+    --line: #e7e2da;
+    --amber: #c98b4a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body, 'Noto Sans SC', sans-serif);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .photo-layout { display: flex; min-height: 100vh; }
+
+  /* ===== 左侧项目栏 ===== */
+  .photo-side {
+    width: 288px; flex: 0 0 288px;
+    border-right: 1px solid var(--line);
+    background: #fff;
+    padding: 34px 26px;
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  }
+  .photo-back {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--font-mono, monospace); font-size: 12px; letter-spacing: .04em;
+    color: var(--ink-dim); text-decoration: none; margin-bottom: 30px;
+    transition: color .2s ease;
+  }
+  .photo-back:hover { color: var(--klein, #1E3A5F); }
+  .photo-logo {
+    font-family: var(--font-serif, serif); font-weight: 500; font-size: 32px;
+    margin: 0 0 2px; letter-spacing: .01em;
+  }
+  .photo-side-sub { font-family: var(--font-mono, monospace); font-size: 12px; color: var(--ink-faint); margin: 0 0 28px; }
+  .photo-albums { display: flex; flex-direction: column; gap: 2px; }
+  .photo-albums a {
+    display: flex; align-items: baseline; justify-content: space-between; gap: 10px;
+    padding: 10px 12px; border-radius: 8px; text-decoration: none;
+    color: var(--ink-dim); transition: background .18s ease, color .18s ease;
+  }
+  .photo-albums a:hover { background: #f3efe9; color: var(--ink); }
+  .photo-albums a.active { background: var(--klein, #1E3A5F); color: #fff; }
+  .photo-albums .aname { font-size: 14.5px; font-weight: 500; }
+  .photo-albums .acount { font-family: var(--font-mono, monospace); font-size: 11px; opacity: .65; }
+
+  /* ===== 右侧瀑布 ===== */
+  .photo-main { flex: 1; padding: 34px 38px 90px; min-width: 0; }
+  .photo-head { margin-bottom: 26px; }
+  .photo-head h2 { font-family: var(--font-serif, serif); font-weight: 500; font-size: 30px; margin: 0 0 4px; }
+  .photo-head .meta { font-family: var(--font-mono, monospace); font-size: 12px; color: var(--ink-faint); letter-spacing: .04em; }
+
+  .photo-masonry { display: flex; align-items: flex-start; gap: 16px; }
+  .mcol { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+  .pitem { margin: 0; cursor: zoom-in; }
+  .pframe {
+    position: relative; border-radius: 6px; overflow: hidden; background: #000;
+    box-shadow: 0 3px 12px rgba(0,0,0,.10);
+  }
+  .pimg {
+    display: block; width: 100%; height: auto;
+    transition: transform .6s cubic-bezier(.2,.7,.3,1);
+  }
+  .pitem:hover .pimg { transform: scale(1.03); }
+  .pno {
+    position: absolute; right: 8px; bottom: 6px; pointer-events: none;
+    font-family: var(--font-mono, monospace); font-size: 11px; letter-spacing: .06em; color: #ffb56b;
+    text-shadow: 0 1px 2px rgba(0,0,0,.7);
+  }
+
+  @media (max-width: 760px) {
+    .photo-layout { flex-direction: column; }
+    .photo-side { width: 100%; flex: none; position: static; height: auto; border-right: none; border-bottom: 1px solid var(--line); padding: 20px 18px; }
+    .photo-albums { flex-direction: row; overflow-x: auto; gap: 6px; padding-bottom: 4px; }
+    .photo-albums a { flex: 0 0 auto; padding: 8px 13px; }
+    .photo-albums .acount { display: none; }
+    .photo-main { padding: 22px 18px 70px; }
+    .photo-masonry { gap: 12px; }
+    .mcol { gap: 12px; }
+  }
+
+  /* ===== 灯箱 ===== */
+  .lb {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(12,11,10,.94); opacity: 0; pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity .25s ease;
+  }
+  .lb.open { opacity: 1; pointer-events: auto; }
+  .lb img { max-width: 88vw; max-height: 84vh; border-radius: 4px; box-shadow: 0 30px 80px rgba(0,0,0,.6); }
+  .lb-close, .lb-nav {
+    position: absolute; border: none; background: rgba(255,255,255,.12); color: #fff;
+    cursor: pointer; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    transition: background .2s ease;
+  }
+  .lb-close:hover, .lb-nav:hover { background: rgba(255,255,255,.26); }
+  .lb-close { top: 22px; right: 22px; width: 46px; height: 46px; font-size: 22px; }
+  .lb-nav { top: 50%; transform: translateY(-50%); width: 52px; height: 52px; font-size: 24px; }
+  .lb-prev { left: 20px; } .lb-next { right: 20px; }
+  .lb-caption { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); font-family: var(--font-serif, serif); font-size: 16px; color: #e9e2d8; letter-spacing: .02em; }
+  .lb-count { position: absolute; top: 30px; left: 50%; transform: translateX(-50%); font-family: var(--font-mono, monospace); font-size: 12px; color: rgba(255,255,255,.6); }
+
+  /* ===== 拖拽排序工具 ===== */
+  .photo-tools { display: flex; align-items: center; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .ptool {
+    font-family: var(--font-mono, monospace); font-size: 12px; letter-spacing: .04em;
+    border: 1px solid var(--line); background: #fff; color: var(--ink-dim);
+    padding: 7px 13px; border-radius: 999px; cursor: pointer;
+    transition: border-color .18s ease, color .18s ease, background .18s ease;
+  }
+  .ptool:hover { border-color: var(--klein, #1E3A5F); color: var(--klein, #1E3A5F); }
+  .ptool.active { background: var(--klein, #1E3A5F); border-color: var(--klein, #1E3A5F); color: #fff; }
+  .ptip { font-size: 12px; color: var(--ink-faint); }
+  .pimg { -webkit-user-drag: none; user-select: none; }
+  .drag-mode .pitem { cursor: grab; }
+  .drag-mode .pitem:active { cursor: grabbing; }
+  .pitem.dragging { opacity: .35; }
+  .drag-mode .pno { background: rgba(0,0,0,.55); padding: 2px 6px; border-radius: 4px; }
+  .pdel {
+    display: none; position: absolute; top: 7px; right: 7px; z-index: 3;
+    width: 24px; height: 24px; border: none; border-radius: 50%;
+    background: rgba(0,0,0,.6); color: #fff; font-size: 13px; line-height: 1;
+    cursor: pointer; align-items: center; justify-content: center; padding: 0;
+  }
+  .drag-mode .pdel { display: flex; }
+  .pdel:hover { background: #c0392b; }
+  .pempty { color: var(--ink-faint); font-size: 13px; padding: 20px 0; }
+</style>
+</head>
+<body>
+<div class="photo-layout">
+  <aside class="photo-side">
+    <a class="photo-back" href="index.html#photography">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Home
+    </a>
+    <h1 class="photo-logo">Photography</h1>
+    <p class="photo-side-sub">Studio Works · 摄影作品</p>
+    <nav class="photo-albums" id="photoAlbums"></nav>
+  </aside>
+
+  <main class="photo-main">
+    <header class="photo-head">
+      <h2 id="photoAlbumTitle">Ary NUS Graduation</h2>
+      <p class="meta" id="photoAlbumMeta">新加坡 · 36 张</p>
+      <div class="photo-tools">
+        <button class="ptool" id="dragToggle" type="button">🖐 拖拽排序</button>
+        <button class="ptool" id="copyOrder" type="button" style="display:none">复制顺序</button>
+        <button class="ptool" id="resetOrder" type="button" style="display:none">重置顺序</button>
+        <button class="ptool" id="restoreDeleted" type="button" style="display:none">恢复已删除</button>
+        <span class="ptip" id="dragTip" style="display:none">拖动排序 · 点照片右上角 ✕ 删除；满意后点「复制顺序」发给我</span>
+      </div>
+    </header>
+    <div class="photo-masonry" id="photoMasonry"></div>
+  </main>
+</div>
+
+<div class="lb" id="lb">
+  <button class="lb-close" aria-label="Close">&times;</button>
+  <button class="lb-nav lb-prev" aria-label="Prev">&#10094;</button>
+  <button class="lb-nav lb-next" aria-label="Next">&#10095;</button>
+  <img src="" alt="">
+  <div class="lb-count" id="lbCount"></div>
+  <div class="lb-caption" id="lbCaption"></div>
+</div>
+
+<script>
+(function () {
+  var ALBUMS = [
+    { id: 'ary',       title: 'Ary NUS Graduation',    city: '新加坡',   count: 28,
+      order: ['ary-11.jpg','ary-09.jpg','ary-10.jpg','ary-08.jpg','ary-34.jpg','ary-04.jpg','ary-35.jpg','ary-05.jpg','ary-06.jpg','ary-31.jpg','ary-29.jpg',
+              'ary-30.jpg','ary-28.jpg','ary-26.jpg','ary-24.jpg','ary-27.jpg','ary-25.jpg','ary-22.jpg','ary-33.jpg','ary-23.jpg','ary-03.jpg','ary-19.jpg',
+              'ary-17.jpg','ary-15.jpg','ary-14.jpg','ary-13.jpg','ary-12.jpg','ary-21.jpg'] },
+    { id: 'dawn',      title: 'Dawn',                  city: '秦皇岛',   count: 8 },
+    { id: 'ditto',     title: 'Ditto',                 city: '新加坡',   count: 11 },
+    { id: 'facial',    title: 'Facial Painting Event', city: '新加坡',   count: 21 },
+    { id: 'fairy',     title: 'Fairy',                 city: '大理',     count: 4 },
+    { id: 'lili',      title: 'Lili',                  city: '大理',     count: 4 },
+    { id: 'ninja',     title: 'Ninja',                 city: '新加坡',   count: 6 },
+    { id: 'sunday',    title: 'Sunday Evening',        city: '新加坡',   count: 10 },
+    { id: 'wei',       title: 'Wei UCSB Graduation',   city: '美国加州', count: 7 }
+  ];
+
+  function album(id) {
+    for (var i = 0; i < ALBUMS.length; i++) if (ALBUMS[i].id === id) return ALBUMS[i];
+    return ALBUMS[0];
+  }
+  function full(a, f) { return 'assets/photography/' + a.id + '/' + f; }
+
+  // 每张照片高宽比（h/w），用于瀑布流按「高度均衡」分列，避免一列明显比另一列长
+  var PHOTO_RATIO = {'ary-01.jpg':1.3333,'ary-02.jpg':1.3333,'ary-03.jpg':1.5009,'ary-04.jpg':1.5009,'ary-05.jpg':1.4995,'ary-06.jpg':1.5009,'ary-07.jpg':1.5009,'ary-08.jpg':1.5009,'ary-09.jpg':1.5009,'ary-10.jpg':0.6663,'ary-11.jpg':0.6663,'ary-12.jpg':1.5009,'ary-13.jpg':1.5009,'ary-14.jpg':1.5009,'ary-15.jpg':1.5009,'ary-16.jpg':1.5009,'ary-17.jpg':0.6663,'ary-18.jpg':0.6663,'ary-19.jpg':0.6663,'ary-20.jpg':0.6663,'ary-21.jpg':0.6663,'ary-22.jpg':1.5009,'ary-23.jpg':1.5009,'ary-24.jpg':1.5009,'ary-25.jpg':1.5009,'ary-26.jpg':1.5009,'ary-27.jpg':1.5009,'ary-28.jpg':0.6663,'ary-29.jpg':0.6663,'ary-30.jpg':0.6663,'ary-31.jpg':0.6663,'ary-32.jpg':0.6663,'ary-33.jpg':1.5009,'ary-34.jpg':0.6663,'ary-35.jpg':0.6663,'ary-36.jpg':0.6663,'dawn-01.jpg':1.5009,'dawn-02.jpg':1.5009,'dawn-03.jpg':1.5009,'dawn-04.jpg':1.5009,'dawn-05.jpg':1.5009,'dawn-06.jpg':1.5009,'dawn-07.jpg':0.6663,'dawn-08.jpg':0.6663,'ditto-01.jpg':1.3333,'ditto-02.jpg':1.3333,'ditto-03.jpg':1.3333,'ditto-04.jpg':1.3333,'ditto-05.jpg':1.3333,'ditto-06.jpg':1.3333,'ditto-07.jpg':1.3333,'ditto-08.jpg':1.3333,'ditto-09.jpg':1.3333,'ditto-10.jpg':1.3333,'ditto-11.jpg':1.3333,'facial-01.jpg':1.3344,'facial-02.jpg':1.3333,'facial-03.jpg':0.6663,'facial-04.jpg':0.6663,'facial-05.jpg':0.6663,'facial-06.jpg':0.6663,'facial-07.jpg':0.6663,'facial-08.jpg':0.6663,'facial-09.jpg':0.6663,'facial-10.jpg':0.6663,'facial-11.jpg':0.6663,'facial-12.jpg':0.6663,'facial-13.jpg':0.6663,'facial-14.jpg':0.6663,'facial-15.jpg':0.6663,'facial-16.jpg':0.6663,'facial-17.jpg':0.6663,'facial-18.jpg':0.6663,'facial-19.jpg':0.6663,'facial-20.jpg':1.5009,'facial-21.jpg':1.5009,'fairy-01.jpg':1.3333,'fairy-02.jpg':1.3333,'fairy-03.jpg':1.3333,'fairy-04.jpg':1.3325,'lili-01.jpg':1.5009,'lili-02.jpg':1.5009,'lili-03.jpg':1.5009,'lili-04.jpg':1.5009,'ninja-01.jpg':1.5009,'ninja-02.jpg':1.5009,'ninja-03.jpg':1.5009,'ninja-04.jpg':1.5009,'ninja-05.jpg':1.5009,'ninja-06.jpg':1.5009,'sunday-01.jpg':0.6663,'sunday-02.jpg':0.5625,'sunday-03.jpg':0.6663,'sunday-04.jpg':0.6663,'sunday-05.jpg':0.6663,'sunday-06.jpg':0.6663,'sunday-07.jpg':0.6663,'sunday-08.jpg':1.5009,'sunday-09.jpg':1.5009,'sunday-10.jpg':1.5009,'wei-01.jpg':1.5009,'wei-02.jpg':1.5009,'wei-03.jpg':1.5009,'wei-04.jpg':1.5009,'wei-05.jpg':1.5009,'wei-06.jpg':1.5009,'wei-07.jpg':1.5009};
+  function ratioOf(f) {
+    var r = PHOTO_RATIO[f];
+    return (typeof r === 'number') ? r : 1;
+  }
+
+  // 顺序持久化（localStorage，file:// 下可能受限，用内存兜底）
+  var memStore = {};
+  function storeGet(k) { try { return window.localStorage.getItem(k); } catch (e) { return memStore[k] || null; } }
+  function storeSet(k, v) { try { window.localStorage.setItem(k, v); } catch (e) { memStore[k] = v; } }
+  function storeDel(k) { try { window.localStorage.removeItem(k); } catch (e) { delete memStore[k]; } }
+
+  function defaultFiles(a) {
+    if (a.order) return a.order.slice();
+    var arr = [];
+    for (var i = 1; i <= a.count; i++) arr.push(a.id + '-' + String(i).padStart(2, '0') + '.jpg');
+    if (a.reverse) arr.reverse();
+    return arr;
+  }
+  function files(a) {
+    var saved = storeGet('photoOrder_v6_' + a.id);
+    if (saved !== null) {
+      try {
+        var arr = JSON.parse(saved);
+        if (Array.isArray(arr)) return arr;
+      } catch (e) {}
+    }
+    return defaultFiles(a);
+  }
+
+  var state = { id: 'ary', index: 0 };
+  var dragMode = false;
+
+  function renderAlbums() {
+    var nav = document.getElementById('photoAlbums');
+    var html = '';
+    ALBUMS.forEach(function (a) {
+      var cls = a.id === state.id ? ' class="active"' : '';
+      html += '<a href="#' + a.id + '" data-id="' + a.id + '"' + cls + '>' +
+        '<span class="aname">' + a.title + '</span>' +
+        '<span class="acount">' + a.count + '</span></a>';
+    });
+    nav.innerHTML = html;
+  }
+
+  function renderMasonry() {
+    var a = album(state.id);
+    var list = files(a);
+    document.getElementById('photoAlbumTitle').textContent = a.title;
+    var meta = a.city + ' · ' + list.length + ' 张';
+    if (list.length !== a.count) meta = a.city + ' · ' + list.length + ' / ' + a.count + ' 张';
+    document.getElementById('photoAlbumMeta').textContent = meta;
+    var m = document.getElementById('photoMasonry');
+    var htmlL = '', htmlR = '', hL = 0, hR = 0;
+    list.forEach(function (f, i) {
+      var r = ratioOf(f);
+      var ar = (1 / r).toFixed(4);
+      var item = '<figure class="pitem" data-file="' + f + '" data-idx="' + i + '">' +
+        '<div class="pframe">' +
+        '<img class="pimg" loading="lazy" style="aspect-ratio:' + ar + '" src="' + full(a, f) + '" alt="' + a.title + ' ' + (i + 1) + '" draggable="false">' +
+        '<button class="pdel" type="button" aria-label="删除">✕</button>' +
+        '<span class="pno">' + (i + 1) + '</span>' +
+        '</div></figure>';
+      if (hL <= hR) { htmlL += item; hL += r; }
+      else { htmlR += item; hR += r; }
+    });
+    m.innerHTML = '<div class="mcol mcol-l"></div><div class="mcol mcol-r"></div>';
+    m.querySelector('.mcol-l').innerHTML = htmlL;
+    m.querySelector('.mcol-r').innerHTML = htmlR;
+    if (!list.length) m.querySelector('.mcol-l').innerHTML = '<div class="pempty">已清空 · 点「恢复已删除」或「重置顺序」找回</div>';
+    applyDragMode();
+  }
+
+  // ---- 灯箱 ----
+  var lb = document.getElementById('lb');
+  var lbImg = lb.querySelector('img');
+  var lbCaption = document.getElementById('lbCaption');
+  var lbCount = document.getElementById('lbCount');
+
+  function showLightbox(i) {
+    var a = album(state.id);
+    var list = files(a);
+    state.index = (i + list.length) % list.length;
+    lbImg.src = full(a, list[state.index]);
+    lbCaption.textContent = a.title + ' · ' + a.city;
+    lbCount.textContent = (state.index + 1) + ' / ' + list.length;
+  }
+  function openLightbox(i) {
+    showLightbox(i);
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  lb.querySelector('.lb-close').addEventListener('click', closeLightbox);
+  lb.querySelector('.lb-prev').addEventListener('click', function () { showLightbox(state.index - 1); });
+  lb.querySelector('.lb-next').addEventListener('click', function () { showLightbox(state.index + 1); });
+  lb.addEventListener('click', function (e) { if (e.target === lb) closeLightbox(); });
+  document.addEventListener('keydown', function (e) {
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'Escape') closeLightbox();
+    else if (e.key === 'ArrowLeft') showLightbox(state.index - 1);
+    else if (e.key === 'ArrowRight') showLightbox(state.index + 1);
+  });
+
+  // 瀑布点击 → 灯箱（排序模式下不触发）
+  document.getElementById('photoMasonry').addEventListener('click', function (e) {
+    if (dragMode) return;
+    var el = e.target.closest('.pitem');
+    if (!el) return;
+    var list = files(album(state.id));
+    var idx = list.indexOf(el.getAttribute('data-file'));
+    if (idx >= 0) openLightbox(idx);
+  });
+
+  // 删除照片（拖拽模式下点 ✕）
+  document.getElementById('photoMasonry').addEventListener('click', function (e) {
+    if (!dragMode) return;
+    var del = e.target.closest('.pdel');
+    if (!del) return;
+    e.preventDefault();
+    deleteItem(del.closest('.pitem'));
+  });
+
+  // ---- 拖拽排序（临时工具）----
+  function applyDragMode() {
+    var m = document.getElementById('photoMasonry');
+    m.classList.toggle('drag-mode', dragMode);
+    Array.prototype.forEach.call(m.querySelectorAll('.pitem'), function (el) {
+      el.draggable = dragMode;
+    });
+  }
+
+  function getFlatItems() {
+    var m = document.getElementById('photoMasonry');
+    var items = Array.prototype.slice.call(m.querySelectorAll('.pitem'));
+    items.sort(function (a, b) {
+      var ai = parseInt(a.getAttribute('data-idx'), 10) || 0;
+      var bi = parseInt(b.getAttribute('data-idx'), 10) || 0;
+      return ai - bi;
+    });
+    return items;
+  }
+
+  function persistOrder() {
+    var order = getFlatItems().map(function (el) { return el.getAttribute('data-file'); });
+    storeSet('photoOrder_v6_' + state.id, JSON.stringify(order));
+  }
+
+  function renumber() {
+    getFlatItems().forEach(function (el, i) {
+      el.setAttribute('data-idx', i);
+      var no = el.querySelector('.pno');
+      if (no) no.textContent = i + 1;
+    });
+  }
+
+  function getDeleted(id) {
+    var saved = storeGet('photoDeleted_v6_' + id);
+    if (saved !== null) {
+      try {
+        var arr = JSON.parse(saved);
+        if (Array.isArray(arr)) return arr;
+      } catch (e) {}
+    }
+    return [];
+  }
+
+  function updateToolbar() {
+    var n = getDeleted(state.id).length;
+    restoreBtn.textContent = n > 0 ? '恢复已删除 (' + n + ')' : '恢复已删除';
+    restoreBtn.style.display = (dragMode && n > 0) ? '' : 'none';
+  }
+
+  function deleteItem(item) {
+    var a = album(state.id);
+    var file = item.getAttribute('data-file');
+    var flat = getFlatItems();
+    var idx = flat.indexOf(item);
+    if (idx >= 0) flat.splice(idx, 1);
+    item.remove();
+    var order = flat.map(function (el) { return el.getAttribute('data-file'); });
+    storeSet('photoOrder_v6_' + a.id, JSON.stringify(order));
+    var deleted = getDeleted(a.id);
+    if (deleted.indexOf(file) < 0) deleted.push(file);
+    storeSet('photoDeleted_v6_' + a.id, JSON.stringify(deleted));
+    layoutFromFlat(flat);
+    renumber();
+    updateToolbar();
+  }
+
+  var dragToggle = document.getElementById('dragToggle');
+  var copyBtn = document.getElementById('copyOrder');
+  var resetBtn = document.getElementById('resetOrder');
+  var restoreBtn = document.getElementById('restoreDeleted');
+  var dragTip = document.getElementById('dragTip');
+
+  dragToggle.addEventListener('click', function () {
+    dragMode = !dragMode;
+    dragToggle.classList.toggle('active', dragMode);
+    dragToggle.textContent = dragMode ? '✓ 排序中（点此结束）' : '🖐 拖拽排序';
+    copyBtn.style.display = dragMode ? '' : 'none';
+    resetBtn.style.display = dragMode ? '' : 'none';
+    dragTip.style.display = dragMode ? '' : 'none';
+    updateToolbar();
+    applyDragMode();
+  });
+
+  copyBtn.addEventListener('click', function () {
+    var list = files(album(state.id));
+    var text = list.join('\n');
+    function fallback() { prompt('复制以下顺序（' + list.length + ' 张）：', text); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        dragTip.textContent = '已复制 ' + list.length + ' 张的顺序到剪贴板';
+      }).catch(fallback);
+    } else {
+      fallback();
+    }
+  });
+
+  resetBtn.addEventListener('click', function () {
+    storeDel('photoOrder_v6_' + state.id);
+    storeDel('photoDeleted_v6_' + state.id);
+    renderMasonry();
+    applyDragMode();
+    updateToolbar();
+  });
+
+  restoreBtn.addEventListener('click', function () {
+    var a = album(state.id);
+    var deleted = getDeleted(a.id);
+    if (!deleted.length) return;
+    var order = files(a).slice().concat(deleted);
+    storeSet('photoOrder_v6_' + a.id, JSON.stringify(order));
+    storeDel('photoDeleted_v6_' + a.id);
+    renderMasonry();
+    applyDragMode();
+    updateToolbar();
+  });
+
+  var masonry = document.getElementById('photoMasonry');
+  var dragging = null;
+  var lastInsertAt = -1;
+
+  masonry.addEventListener('dragstart', function (e) {
+    if (!dragMode) return;
+    var item = e.target.closest('.pitem');
+    if (!item) return;
+    dragging = item;
+    lastInsertAt = -1;
+    item.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    try { e.dataTransfer.setData('text/plain', item.getAttribute('data-file')); } catch (err) {}
+  });
+
+  function layoutFromFlat(flat) {
+    var m = document.getElementById('photoMasonry');
+    var colL = m.querySelector('.mcol-l');
+    var colR = m.querySelector('.mcol-r');
+    var fragL = document.createDocumentFragment();
+    var fragR = document.createDocumentFragment();
+    var hL = 0, hR = 0;
+    flat.forEach(function (el, i) {
+      el.setAttribute('data-idx', i);
+      var r = ratioOf(el.getAttribute('data-file'));
+      if (hL <= hR) { fragL.appendChild(el); hL += r; }
+      else { fragR.appendChild(el); hR += r; }
+    });
+    colL.appendChild(fragL);
+    colR.appendChild(fragR);
+  }
+
+  masonry.addEventListener('dragover', function (e) {
+    if (!dragMode || !dragging) return;
+    e.preventDefault();
+    var target = e.target.closest('.pitem');
+    if (!target || target === dragging) return;
+    var flat = getFlatItems();
+    var tIdx = flat.indexOf(target);
+    if (tIdx < 0) return;
+    var rect = target.getBoundingClientRect();
+    var after = (e.clientY - rect.top) > rect.height / 2;
+    var insertAt = after ? tIdx + 1 : tIdx;
+    if (insertAt === lastInsertAt) return;
+    lastInsertAt = insertAt;
+    var dIdx = flat.indexOf(dragging);
+    if (dIdx < 0) return;
+    flat.splice(dIdx, 1);
+    if (insertAt > dIdx) insertAt--;
+    flat.splice(insertAt, 0, dragging);
+    layoutFromFlat(flat);
+  });
+
+  masonry.addEventListener('dragend', function () {
+    if (!dragMode) return;
+    if (dragging) dragging.classList.remove('dragging');
+    dragging = null;
+    lastInsertAt = -1;
+    persistOrder();
+    renumber();
+  });
+
+  masonry.addEventListener('drop', function (e) { e.preventDefault(); });
+
+  // 左侧切换
+  document.getElementById('photoAlbums').addEventListener('click', function (e) {
+    var el = e.target.closest('a');
+    if (!el) return;
+    e.preventDefault();
+    setAlbum(el.getAttribute('data-id'));
+  });
+
+  function setAlbum(id) {
+    state.id = album(id).id;
+    renderAlbums();
+    renderMasonry();
+    if (history.replaceState) history.replaceState(null, '', '#' + state.id);
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  }
+
+  // 初始：?album= 或 hash 或默认
+  var q = new URLSearchParams(window.location.search).get('album');
+  var h = window.location.hash.replace('#', '');
+  var initial = q || h || 'ary';
+  if (!album(initial)) initial = 'ary';
+  state.id = initial;
+  renderAlbums();
+  renderMasonry();
+  if (history.replaceState) history.replaceState(null, '', '#' + state.id);
+})();
+</script>
+</body>
+</html>
