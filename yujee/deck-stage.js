@@ -68,6 +68,30 @@
       overflow: hidden;
     }
 
+    :host([scroll]) {
+      position: relative;
+      inset: auto;
+      min-height: 100%;
+      height: auto;
+      overflow: visible;
+      background: #f2f2f0;
+    }
+    :host([scroll]) .stage { position: relative; display: block; }
+    :host([scroll]) .canvas { width: 100% !important; height: auto !important; transform: none !important; }
+    :host([scroll]) ::slotted(*) {
+      position: relative !important;
+      inset: auto !important;
+      display: block !important;
+      width: var(--deck-design-w, 1920px) !important;
+      height: var(--deck-design-h, 1080px) !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      pointer-events: auto !important;
+      margin: 0 auto 24px !important;
+      transform-origin: top center !important;
+    }
+    :host([scroll]) .overlay, :host([scroll]) .tapzones { display: none !important; }
+
     .stage {
       position: absolute;
       inset: 0;
@@ -266,7 +290,7 @@
   `;
 
   class DeckStage extends HTMLElement {
-    static get observedAttributes() { return ['width', 'height', 'noscale']; }
+    static get observedAttributes() { return ['width', 'height', 'noscale', 'scroll']; }
 
     constructor() {
       super();
@@ -322,6 +346,8 @@
     }
 
     _render() {
+      this.style.setProperty('--deck-design-w', this.designWidth + 'px');
+      this.style.setProperty('--deck-design-h', this.designHeight + 'px');
       const style = document.createElement('style');
       style.textContent = stylesheet;
 
@@ -475,6 +501,15 @@
 
     _applyIndex({ showOverlay = true, broadcast = true, reason = 'init' } = {}) {
       if (!this._slides.length) return;
+      if (this.hasAttribute('scroll')) {
+        this._slides.forEach((s) => {
+          s.setAttribute('data-deck-active', '');
+          s.style.opacity = '1';
+          s.style.visibility = 'visible';
+          s.style.pointerEvents = 'auto';
+        });
+        return;
+      }
       const prev = this._prevIndex == null ? -1 : this._prevIndex;
       const curr = this._index;
       // Keep the iframe's own hash in sync so an in-iframe location.reload()
@@ -526,6 +561,18 @@
 
     _fit() {
       if (!this._canvas) return;
+      if (this.hasAttribute('scroll')) {
+        const s = Math.min(window.innerWidth / this.designWidth, 1);
+        this._canvas.style.width = '100%';
+        this._canvas.style.height = 'auto';
+        this._slides.forEach((slide) => {
+          slide.style.width = this.designWidth + 'px';
+          slide.style.height = this.designHeight + 'px';
+          slide.style.transform = 'none';
+          slide.style.zoom = String(s);
+        });
+        return;
+      }
       // PPTX export sets noscale so the DOM capture sees authored-size
       // geometry — the scaled canvas is in shadow DOM, so the exporter's
       // resetTransformSelector can't reach .canvas.style.transform directly.
